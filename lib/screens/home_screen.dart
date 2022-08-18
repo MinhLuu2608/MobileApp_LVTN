@@ -1,3 +1,5 @@
+import 'package:MobileApp_LVTN/screens/invoices_screen.dart';
+import 'package:MobileApp_LVTN/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget{
@@ -10,10 +12,17 @@ class HomeScreen extends StatefulWidget{
 class _HomeScreenState extends State<HomeScreen>{
   int _selectedIndex = 0;
   static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const screens = [
+
+  List<Widget> title = [
+    Text('Trang chủ', style: optionStyle),
+    Text('Hoá đơn', style: optionStyle),
+    Text('Cài đặt', style: optionStyle),
+  ];
+
+  List<Widget> screens = [
     Text('Home', style: optionStyle),
-    Text('Receipt', style: optionStyle),
-    Text('Settings', style: optionStyle),
+    InvoicesScreen(),
+    SettingsScreen(),
   ];
 
   void _onItemTapped(int index){
@@ -26,17 +35,17 @@ class _HomeScreenState extends State<HomeScreen>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: screens[_selectedIndex]),
+        title: Center(child: title[_selectedIndex]),
       ),
-      body: Center(
-        child: screens[_selectedIndex],
+      body: (
+          screens[_selectedIndex]
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.receipt), label: "Receipt"),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Setting"),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Trang chủ"),
+          BottomNavigationBarItem(icon: Icon(Icons.receipt), label: "Hoá đơn"),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Cài đặt"),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.lightBlue,

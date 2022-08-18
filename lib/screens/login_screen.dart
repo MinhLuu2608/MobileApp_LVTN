@@ -1,20 +1,59 @@
 import 'package:MobileApp_LVTN/constants.dart';
+import 'package:MobileApp_LVTN/global_variables.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:MobileApp_LVTN/models/useraccount.dart';
-import 'package:MobileApp_LVTN/providers/useraccount_provider.dart';
 import 'package:MobileApp_LVTN/widgets/inputDecoration.dart';
-import 'package:MobileApp_LVTN/widgets/inputTextFormField.dart';
-import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 final urlAPI = url;
 
-class LoginScreen extends StatelessWidget {
-  LoginScreen({Key? key}) : super(key: key);
+class LoginPage extends StatefulWidget{
+  const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  LoginScreen createState() => LoginScreen();
+}
+
+class LoginScreen extends State<LoginPage> {
+
+  var txtUsername = TextEditingController();
+  var txtPassword = TextEditingController();
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final formKey = GlobalKey<FormState>();
+
+  bool isChecked = false;
+  late Box box1;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    createOpenBox();
+  }
+  void createOpenBox() async{
+    box1 = await Hive.openBox('logindata');
+    getData();
+  }
+
+  void getData() async{
+    if(box1.get('username')!=null){
+      txtUsername.text = box1.get('username');
+      isChecked = true;
+      setState(() {
+
+      });
+    }
+    if(box1.get('password')!=null){
+      txtPassword.text = box1.get('password');
+      isChecked = true;
+      setState(() {
+
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -38,13 +77,9 @@ class LoginScreen extends StatelessWidget {
 
   SingleChildScrollView loginForm(BuildContext context) {
     // final userAccountProvider = Provider.of<UserAccount_provider>(context);
-    var txtUsername = TextEditingController();
-    var txtPassword = TextEditingController();
 
     checkLogin(String username, String password) async{
-
       final url = Uri.http(urlAPI, 'api/MobileApp/$username/$password');
-      print(url);
       final resp = await http.get(url, headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Credentials": "true",
@@ -59,6 +94,18 @@ class LoginScreen extends StatelessWidget {
       else {
         return false;
       }
+    }
+
+    setIDAccount(String username, String password) async{
+      final urlGetIDAccount = Uri.http(urlAPI, 'api/MobileApp/getIDAccount/$username/$password');
+      final respGetIDAccount = await http.get(urlGetIDAccount, headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": "true",
+        "Content-type": "application/json",
+        "Accept": "application/json"
+      });
+      final idAccount = respGetIDAccount.body;
+      box1.put('IDAccount', idAccount);
     }
 
     return SingleChildScrollView(
@@ -129,6 +176,22 @@ class LoginScreen extends StatelessWidget {
                             icon: const Icon(Icons.lock_outline)),
                       ),
                       const SizedBox(height: 30),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Checkbox(
+                            value: isChecked,
+                            onChanged: (value){
+                              isChecked = !isChecked;
+                              setState(() {
+
+                              });
+                            },
+                          ),
+                          Text("Nhớ mật khẩu",style: TextStyle(color: Colors.black, fontSize: 20),)
+                        ],
+                      ),
+                      const SizedBox(height: 30),
                       MaterialButton(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
@@ -148,11 +211,16 @@ class LoginScreen extends StatelessWidget {
                           }
                           else{
                             if( await checkLogin(txtUsername.text, txtPassword.text) ){
-                              print("Đăng nhập thành công");
+                              rememberPassword(txtUsername.text, txtPassword.text);
+                              setIDAccount(txtUsername.text, txtPassword.text);
+                              print(IDAccount);
+                              final snackBar = SnackBar(content: Text("Đăng nhập thành công"));
+                              _scaffoldKey.currentState!.showSnackBar(snackBar);
                               Navigator.pushReplacementNamed(context, 'home');
                             }
                             else{
-                              print("Đăng nhập thất bại");
+                              final snackBar = SnackBar(content: Text("Đăng nhập thất bại"));
+                              _scaffoldKey.currentState!.showSnackBar(snackBar);
                             }
                           }
                         },
@@ -188,6 +256,13 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
+  void rememberPassword(String username, String password){
+    if(isChecked){
+      box1.put('username', username);
+      box1.put('password', password);
+    }
+  }
+
   SafeArea iconContainer() {
     return SafeArea(
       child: Container(
@@ -203,24 +278,24 @@ class LoginScreen extends StatelessWidget {
   }
 
   Container purpleContainer(Size size) {
-    return Container(
-      decoration: const BoxDecoration(
-          gradient: LinearGradient(colors: [
-        Color.fromRGBO(63, 63, 156, 1),
-        Color.fromRGBO(90, 70, 178, 1),
-      ])),
-      width: double.infinity,
-      height: size.height * 0.4,
-      child: Stack(
-        children: [
-          Positioned(top: 90, left: 30, child: bubbleDecoration()),
-          Positioned(top: -40, left: -30, child: bubbleDecoration()),
-          Positioned(bottom: -50, left: 10, child: bubbleDecoration()),
-          Positioned(top: -50, right: -20, child: bubbleDecoration()),
-          Positioned(bottom: 120, right: 20, child: bubbleDecoration()),
-        ],
-      ),
-    );
+      return Container(
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(colors: [
+              Color.fromRGBO(63, 63, 156, 1),
+              Color.fromRGBO(90, 70, 178, 1),
+            ])),
+        width: double.infinity,
+        height: size.height * 0.4,
+        child: Stack(
+          children: [
+            Positioned(top: 90, left: 30, child: bubbleDecoration()),
+            Positioned(top: -40, left: -30, child: bubbleDecoration()),
+            Positioned(bottom: -50, left: 10, child: bubbleDecoration()),
+            Positioned(top: -50, right: -20, child: bubbleDecoration()),
+            Positioned(bottom: 120, right: 20, child: bubbleDecoration()),
+          ],
+        ),
+      );
   }
 
   Container bubbleDecoration() {
