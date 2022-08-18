@@ -5,13 +5,14 @@ import 'package:MobileApp_LVTN/models/useraccount.dart';
 import 'package:MobileApp_LVTN/providers/useraccount_provider.dart';
 import 'package:MobileApp_LVTN/widgets/inputDecoration.dart';
 import 'package:MobileApp_LVTN/widgets/inputTextFormField.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 final urlAPI = url;
 
-class LoginScreen extends StatelessWidget {
-  LoginScreen({Key? key}) : super(key: key);
+class RegisterScreen extends StatelessWidget {
+  RegisterScreen({Key? key}) : super(key: key);
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final formKey = GlobalKey<FormState>();
@@ -37,13 +38,15 @@ class LoginScreen extends StatelessWidget {
   }
 
   SingleChildScrollView loginForm(BuildContext context) {
-    // final userAccountProvider = Provider.of<UserAccount_provider>(context);
+
     var txtUsername = TextEditingController();
     var txtPassword = TextEditingController();
+    var txtRepass = TextEditingController();
+    var txtSDT = TextEditingController();
 
-    checkLogin(String username, String password) async{
+    accountRegister(String username, String password, String SDT) async{
 
-      final url = Uri.http(urlAPI, 'api/MobileApp/$username/$password');
+      final url = Uri.http(urlAPI, 'api/MobileApp/$username/$password/$SDT');
       print(url);
       final resp = await http.get(url, headers: {
         "Access-Control-Allow-Origin": "*",
@@ -52,13 +55,7 @@ class LoginScreen extends StatelessWidget {
         "Accept": "application/json"
       });
       final response = resp.body;
-
-      if(response == "true") {
-        return true;
-      }
-      else {
-        return false;
-      }
+      return response;
     }
 
     return SingleChildScrollView(
@@ -85,8 +82,8 @@ class LoginScreen extends StatelessWidget {
             child: Column(
               children: [
                 const SizedBox(height: 10),
-                Text('Đăng nhập', style: Theme.of(context).textTheme.headline4),
-                const SizedBox(height: 30),
+                Text('Đăng ký', style: Theme.of(context).textTheme.headline4),
+                const SizedBox(height: 15),
                 Form(
                   key: formKey,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -104,16 +101,24 @@ class LoginScreen extends StatelessWidget {
                               ? null
                               : "Username không thể trống";
                         },
-                        // validator: (value) {
-                        //   String pattern =
-                        //       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
-                        //   RegExp regExp = new RegExp(pattern);
-                        //   return regExp.hasMatch(value ?? '')
-                        //       ? null
-                        //       : 'Không phải định dạng email';
-                        // },
                       ),
-                      const SizedBox(height: 30),
+                      TextFormField(
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.digitsOnly,
+                          FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
+                        ],
+                        autocorrect: false,
+                        controller: txtSDT,
+                        decoration: InputDecorations.inputDecoration(
+                            hintText: '0123456789',
+                            labelText: 'Số điện thoại',
+                            icon: const Icon(Icons.phone)),
+                        validator: (value) {
+                          return (value != null && value.length == 10)
+                              ? null
+                              : "SDT phải có 10 ký tự";
+                        },
+                      ),
                       TextFormField(
                         autocorrect: false,
                         controller: txtPassword,
@@ -128,7 +133,21 @@ class LoginScreen extends StatelessWidget {
                             labelText: 'Password',
                             icon: const Icon(Icons.lock_outline)),
                       ),
-                      const SizedBox(height: 30),
+                      TextFormField(
+                        autocorrect: false,
+                        controller: txtRepass,
+                        obscureText: true,
+                        validator: (value) {
+                          return (value == txtPassword.text)
+                              ? null
+                              : "Không giống Password đã nhập ở trên";
+                        },
+                        decoration: InputDecorations.inputDecoration(
+                            hintText: '*******',
+                            labelText: 'Nhập lại mật khẩu',
+                            icon: const Icon(Icons.lock_outline)),
+                      ),
+                      const SizedBox(height: 20),
                       MaterialButton(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
@@ -137,34 +156,32 @@ class LoginScreen extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 80, vertical: 15),
-                          child: const Text('Đăng nhập',
+                          child: const Text('Đăng ký',
                               style: TextStyle(color: Colors.white, fontSize: 20)),
                         ),
                         onPressed: () async{
                           // var userAccount = userAccountProvider.userAccount;
                           if(!formKey.currentState!.validate()){
-                            final snackBar = SnackBar(content: Text("Username hoặc password không hợp lệ"));
+                            final snackBar = SnackBar(content: Text("Thông tin đăng ký không hợp lệ"));
                             _scaffoldKey.currentState!.showSnackBar(snackBar);
                           }
                           else{
-                            if( await checkLogin(txtUsername.text, txtPassword.text) ){
-                              print("Đăng nhập thành công");
-                              Navigator.pushReplacementNamed(context, 'home');
-                            }
-                            else{
-                              print("Đăng nhập thất bại");
-                            }
+                            final respone = await accountRegister(txtUsername.text, txtPassword.text, txtSDT.text);
+                            final snackBar = SnackBar(content: Text(respone));
+                            _scaffoldKey.currentState!.showSnackBar(snackBar);
+
                           }
+
                         },
                       ),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Bạn chưa có tài khoản? "),
+                          Text("Đã có tài khoản? "),
                           GestureDetector(
                             child: Text(
-                                " Đăng ký ngay",
+                                " Đăng nhập",
                                 style: TextStyle(
                                     fontSize: 18,
                                     color: Colors.lightBlue,
@@ -172,7 +189,7 @@ class LoginScreen extends StatelessWidget {
                                 )
                             ),
                             onTap: (){
-                              Navigator.pushReplacementNamed(context, 'register');
+                              Navigator.pushReplacementNamed(context, 'login');
                             },
                           )
                         ],
@@ -206,9 +223,9 @@ class LoginScreen extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
           gradient: LinearGradient(colors: [
-        Color.fromRGBO(63, 63, 156, 1),
-        Color.fromRGBO(90, 70, 178, 1),
-      ])),
+            Color.fromRGBO(63, 63, 156, 1),
+            Color.fromRGBO(90, 70, 178, 1),
+          ])),
       width: double.infinity,
       height: size.height * 0.4,
       child: Stack(

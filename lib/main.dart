@@ -1,4 +1,5 @@
 
+import 'package:MobileApp_LVTN/screens/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:MobileApp_LVTN/providers/useraccount_provider.dart';
 import 'package:MobileApp_LVTN/screens/home_screen.dart';
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget{
         title: "Material App",
         routes: {
           'login' : (_) => LoginScreen(),
+          'register' : (_) => RegisterScreen(),
           'home' : (_) => HomeScreen(),
         },
         initialRoute: 'login',
