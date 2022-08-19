@@ -17,9 +17,6 @@ class _ExpansionListState extends State<ExpansionList> {
   static const TextStyle optionSubStyle =
       TextStyle(fontSize: 14, fontWeight: FontWeight.bold);
 
-  List<Invoice> invoices = [];
-  List<Item> _data = [];
-
   late Box box1;
 
   @override
@@ -48,88 +45,6 @@ class _ExpansionListState extends State<ExpansionList> {
     return response;
   }
 
-  Widget _buildListPanel() {
-    createOpenBox();
-    return ExpansionPanelList(
-      dividerColor: Colors.black38,
-      expansionCallback: (int index, bool isExpanded) {
-        setState(() {
-          _data[index].isExpanded = !isExpanded;
-        });
-      },
-      children: _data.map<ExpansionPanel>((Item item) {
-        return ExpansionPanel(
-            canTapOnHeader: true,
-            // backgroundColor: Colors.amberAccent,
-            headerBuilder: (BuildContext context, bool isExpanded) {
-              return ListTile(
-                leading: Icon(Icons.receipt),
-                title: Row(
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 1),
-                        Text(item.maSoPhieu, style: optionMainStyle),
-                        SizedBox(height: 2),
-                        Text(item.tenKyThu, style: optionMainStyle),
-                        SizedBox(height: 3),
-                      ],
-                    ),
-                    Expanded(
-                        child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        SizedBox(height: 10),
-                        Text("Đã thu", style: optionMainStyle)
-                      ],
-                    )),
-                  ],
-                ),
-                subtitle: Text("Tên khách hàng", style: optionSubStyle),
-              );
-            },
-            body: ListTile(
-              title: Text("Info chi tiết"),
-              onTap: () {
-                setState(() {
-                  _data.removeWhere((currentItem) => item == currentItem);
-                });
-              },
-            ),
-            isExpanded: item.isExpanded);
-      }).toList(),
-    );
-  }
-
-  // Widget _buildListView(List<Item> items){
-  //   return ListView(
-  //     children: items.map((Item item) {
-  //       return Card(
-  //         shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.circular(10)
-  //         ),
-  //         elevation: 10,
-  //         child: Row(
-  //           mainAxisAlignment: MainAxisAlignment.start,
-  //           children: <Widget>[
-  //             Column(
-  //               mainAxisAlignment: MainAxisAlignment.start,
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: <Widget>[
-  //                 Padding(padding: EdgeInsets.only(top: 10)),
-  //                 Text(item.maSoPhieu),
-  //                 Text(item.tenKyThu),
-  //                 Text(item.hoTenKH),
-  //               ],
-  //             )
-  //           ],
-  //         ),
-  //       );
-  //     }).toList(),
-  //   );
-  // }
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -206,36 +121,3 @@ class _ExpansionListState extends State<ExpansionList> {
   }
 }
 
-class Item {
-  int idHoaDon;
-  String maSoPhieu;
-  String ngayThu;
-  String tenKyThu;
-  int idAccount;
-  String hoTenKH;
-  int gia;
-  bool isExpanded;
-
-  Item(
-      {this.idHoaDon = 0,
-      this.maSoPhieu = '',
-      this.ngayThu = '',
-      this.tenKyThu = '',
-      this.idAccount = 0,
-      this.hoTenKH = '',
-      this.gia = 0,
-      this.isExpanded = false});
-}
-
-List<Item> generateItems(List<Invoice> invoices) {
-  return invoices.map((invoice) {
-    return Item(
-        idHoaDon: invoice.idHoaDon,
-        maSoPhieu: invoice.maSoPhieu,
-        ngayThu: invoice.ngayThu,
-        tenKyThu: invoice.tenKyThu,
-        idAccount: invoice.idAccount,
-        hoTenKH: invoice.hoTenKH,
-        gia: invoice.gia);
-  }).toList();
-}
