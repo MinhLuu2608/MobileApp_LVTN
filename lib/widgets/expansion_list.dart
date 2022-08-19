@@ -34,6 +34,7 @@ class _ExpansionListState extends State<ExpansionList> {
   }
 
   Future<List<Invoice>> getHoaDon() async {
+    box1 = await Hive.openBox('logindata');
     final int IDAccount = box1.get("IDAccount");
     final url = Uri.http(urlAPI, 'api/MobileApp/getHoaDon/$IDAccount');
 
@@ -131,13 +132,76 @@ class _ExpansionListState extends State<ExpansionList> {
   // }
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: FutureBuilder(
-        future: getHoaDon(),
-        builder: (BuildContext context, AsyncSnapshot snapshot){
-          return Text("hello");
-        },
-      ),
+    return FutureBuilder(
+      future: getHoaDon(),
+      builder: (BuildContext context, AsyncSnapshot snapshot){
+        if(snapshot.connectionState != ConnectionState.done){
+          return Center(child: CircularProgressIndicator());
+        }
+        if(snapshot.hasError){
+          return Text("Something Wrong");
+        }
+        if(snapshot.hasData){
+          return ListView.builder(
+            shrinkWrap: true,
+            padding: const EdgeInsets.all(10),
+            itemCount: snapshot.data.length,
+            itemBuilder: (BuildContext context, int index){
+              return Padding(
+                padding: const EdgeInsets.all(3),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)
+                  ),
+                  color: Colors.grey[300],
+                  elevation: 10,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Text(snapshot.data[index].maSoPhieu),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Text(snapshot.data[index].tenKyThu),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Text(snapshot.data[index].hoTenKH),
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: snapshot.data[index].ngayThu == "Chưa thu"
+                                  ?
+                              Text("Chưa thu", style: TextStyle(color: Colors.pink, fontSize: 20),)
+                                  :
+                              Text("Đã thu", style: TextStyle(color: Colors.lightGreen, fontSize: 20)),
+                            ),
+
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        }
+
+        return Text("Error while Calling API");
+      },
     );
   }
 }
