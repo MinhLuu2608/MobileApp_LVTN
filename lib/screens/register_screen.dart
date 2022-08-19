@@ -1,12 +1,8 @@
 import 'package:MobileApp_LVTN/constants.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:MobileApp_LVTN/models/useraccount.dart';
-import 'package:MobileApp_LVTN/providers/useraccount_provider.dart';
 import 'package:MobileApp_LVTN/widgets/inputDecoration.dart';
-import 'package:MobileApp_LVTN/widgets/inputTextFormField.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 final urlAPI = url;

@@ -1,5 +1,4 @@
 import 'package:MobileApp_LVTN/constants.dart';
-import 'package:MobileApp_LVTN/global_variables.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:MobileApp_LVTN/widgets/inputDecoration.dart';
@@ -105,7 +104,7 @@ class LoginScreen extends State<LoginPage> {
         "Accept": "application/json"
       });
       final idAccount = respGetIDAccount.body;
-      box1.put('IDAccount', idAccount);
+      box1.put('IDAccount', int.parse(idAccount));
     }
 
     return SingleChildScrollView(
@@ -213,7 +212,6 @@ class LoginScreen extends State<LoginPage> {
                             if( await checkLogin(txtUsername.text, txtPassword.text) ){
                               rememberPassword(txtUsername.text, txtPassword.text);
                               setIDAccount(txtUsername.text, txtPassword.text);
-                              print(IDAccount);
                               final snackBar = SnackBar(content: Text("Đăng nhập thành công"));
                               _scaffoldKey.currentState!.showSnackBar(snackBar);
                               Navigator.pushReplacementNamed(context, 'home');
@@ -260,6 +258,10 @@ class LoginScreen extends State<LoginPage> {
     if(isChecked){
       box1.put('username', username);
       box1.put('password', password);
+    }
+    else{
+      box1.delete('username');
+      box1.delete('password');
     }
   }
 
