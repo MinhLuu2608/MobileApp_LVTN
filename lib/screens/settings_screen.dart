@@ -66,7 +66,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.login_outlined),
+                  Icon(Icons.logout_outlined),
                   SizedBox(width: 10),
                   Text("Đăng xuất", style: TextStyle(
                     fontSize: 22, letterSpacing: 2.2, color: Colors.black

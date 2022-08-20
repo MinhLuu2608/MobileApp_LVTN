@@ -1,5 +1,6 @@
 import 'package:MobileApp_LVTN/constants.dart';
 import 'package:MobileApp_LVTN/models/invoice.dart';
+import 'package:MobileApp_LVTN/screens/invoice_info.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
@@ -14,10 +15,11 @@ class ExpansionList extends StatefulWidget {
 
 class _ExpansionListState extends State<ExpansionList> {
   static const TextStyle optionMainStyle = TextStyle(fontSize: 16);
-  static const TextStyle optionSubStyle =
-      TextStyle(fontSize: 14, fontWeight: FontWeight.bold);
+  static const TextStyle optionSubStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.bold);
 
   late Box box1;
+
+  var updateState = false;
 
   @override
   void initState() {
@@ -45,6 +47,12 @@ class _ExpansionListState extends State<ExpansionList> {
     return response;
   }
 
+  Future refresh() async{
+    setState(() {
+      updateState = !updateState;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -57,61 +65,71 @@ class _ExpansionListState extends State<ExpansionList> {
           return Text("Something Wrong");
         }
         if(snapshot.hasData){
-          return ListView.builder(
-            shrinkWrap: true,
-            padding: const EdgeInsets.all(10),
-            itemCount: snapshot.data.length,
-            itemBuilder: (BuildContext context, int index){
-              return Padding(
-                padding: const EdgeInsets.all(3),
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)
-                  ),
-                  color: Colors.grey[300],
-                  elevation: 10,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      Column(
+          return RefreshIndicator(
+            onRefresh: refresh,
+            child: ListView.builder(
+              shrinkWrap: true,
+              padding: const EdgeInsets.all(10),
+              itemCount: snapshot.data.length,
+              itemBuilder: (BuildContext context, int index){
+                return Padding(
+                  padding: const EdgeInsets.all(3),
+                  child: InkWell(
+                    onTap: (){
+                      Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => InvoiceInfo(invoice: snapshot.data[index])
+                          ));
+                    },
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)
+                      ),
+                      color: Colors.grey[300],
+                      elevation: 10,
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Text(snapshot.data[index].maSoPhieu),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(snapshot.data[index].maSoPhieu),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(snapshot.data[index].tenKyThu),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(snapshot.data[index].hoTenKH),
+                              ),
+                            ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Text(snapshot.data[index].tenKyThu),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Text(snapshot.data[index].hoTenKH),
-                          ),
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: snapshot.data[index].ngayThu == "Chưa thu"
+                                      ?
+                                  Text("Chưa thu", style: TextStyle(color: Colors.pink, fontSize: 20),)
+                                      :
+                                  Text("Đã thu", style: TextStyle(color: Colors.lightGreen, fontSize: 20)),
+                                ),
+
+                              ],
+                            ),
+                          )
                         ],
                       ),
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: snapshot.data[index].ngayThu == "Chưa thu"
-                                  ?
-                              Text("Chưa thu", style: TextStyle(color: Colors.pink, fontSize: 20),)
-                                  :
-                              Text("Đã thu", style: TextStyle(color: Colors.lightGreen, fontSize: 20)),
-                            ),
-
-                          ],
-                        ),
-                      )
-                    ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         }
 
