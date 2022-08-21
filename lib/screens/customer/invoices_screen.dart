@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:MobileApp_LVTN/constants.dart';
-import 'package:MobileApp_LVTN/screens/invoices_list.dart';
+import 'invoices_list.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
@@ -15,6 +15,8 @@ class InvoicesScreen extends StatefulWidget{
 }
 
 class _InvoicesScreenState extends State<InvoicesScreen>{
+
+  var updateState = false;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final formKey = GlobalKey<FormState>();
@@ -101,6 +103,9 @@ class _InvoicesScreenState extends State<InvoicesScreen>{
                           final snackBar = SnackBar(content: Text(response));
                           _scaffoldKey.currentState!.showSnackBar(snackBar);
                           Navigator.of(context).pop();
+                          setState(() {
+                            updateState = !updateState;
+                          });
                         },
                         child: Text("Liên kết mã khách hàng")
                     ),

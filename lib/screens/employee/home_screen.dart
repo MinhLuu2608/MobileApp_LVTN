@@ -1,15 +1,15 @@
-import 'package:MobileApp_LVTN/screens/invoices_screen.dart';
+import 'invoices_screen.dart';
 import 'package:MobileApp_LVTN/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatefulWidget{
-  HomeScreen({Key? key}) : super (key: key);
+class EmpHomeScreen extends StatefulWidget{
+  EmpHomeScreen({Key? key}) : super (key: key);
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _EmpHomeScreenState createState() => _EmpHomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>{
+class _EmpHomeScreenState extends State<EmpHomeScreen>{
   int _selectedIndex = 0;
   static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
@@ -20,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen>{
   ];
 
   List<Widget> screens = [
-    Text('Home', style: optionStyle),
+    Text('Home Nhân viên', style: optionStyle),
     InvoicesScreen(),
     SettingsScreen(),
   ];

@@ -33,6 +33,7 @@ class LoginScreen extends State<LoginPage> {
   }
   void createOpenBox() async{
     box1 = await Hive.openBox('logindata');
+    box1.put("IDAccount", "-1");
     getData();
   }
 
@@ -105,6 +106,20 @@ class LoginScreen extends State<LoginPage> {
       });
       final idAccount = respGetIDAccount.body;
       box1.put('IDAccount', int.parse(idAccount));
+    }
+
+    setIDNhanVien() async{
+      final idAccount = box1.get("IDAccount");
+      final urlGetIDAccount = Uri.http(urlAPI, 'api/MobileApp/getEmpID/$idAccount');
+
+      final respGetIDAccount = await http.get(urlGetIDAccount, headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": "true",
+        "Content-type": "application/json",
+        "Accept": "application/json"
+      });
+      final idNhanVien = respGetIDAccount.body;
+      box1.put('IDNhanVien', int.parse(idNhanVien));
     }
 
     return SingleChildScrollView(
@@ -212,9 +227,15 @@ class LoginScreen extends State<LoginPage> {
                             if( await checkLogin(txtUsername.text, txtPassword.text) ){
                               rememberPassword(txtUsername.text, txtPassword.text);
                               setIDAccount(txtUsername.text, txtPassword.text);
+                              setIDNhanVien();
                               final snackBar = SnackBar(content: Text("Đăng nhập thành công"));
                               _scaffoldKey.currentState!.showSnackBar(snackBar);
-                              Navigator.pushReplacementNamed(context, 'home');
+                              if(box1.get("IDNhanVien") == -1){
+                                Navigator.pushReplacementNamed(context, 'customer/home');
+                              }
+                              else{
+                                Navigator.pushReplacementNamed(context, 'employee/home');
+                              }
                             }
                             else{
                               final snackBar = SnackBar(content: Text("Đăng nhập thất bại"));

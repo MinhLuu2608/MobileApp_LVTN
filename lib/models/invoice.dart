@@ -1,6 +1,6 @@
 // To parse this JSON data, do
 //
-//     final invoice = invoiceFromJson(jsonString);
+//     final customer = invoiceFromJson(jsonString);
 
 import 'dart:convert';
 

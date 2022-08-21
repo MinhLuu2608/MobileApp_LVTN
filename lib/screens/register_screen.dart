@@ -26,14 +26,14 @@ class RegisterScreen extends StatelessWidget {
           children: [
             purpleContainer(size),
             iconContainer(),
-            loginForm(context)
+            registerForm(context)
           ],
         ),
       ),
     );
   }
 
-  SingleChildScrollView loginForm(BuildContext context) {
+  SingleChildScrollView registerForm(BuildContext context) {
 
     var txtUsername = TextEditingController();
     var txtPassword = TextEditingController();

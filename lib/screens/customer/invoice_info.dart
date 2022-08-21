@@ -1,6 +1,5 @@
 import 'package:MobileApp_LVTN/constants.dart';
 import 'package:MobileApp_LVTN/models/invoice.dart';
-import 'package:MobileApp_LVTN/screens/payment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -149,8 +148,8 @@ class InvoiceInfoState extends State<InvoiceInfo>{
                               borderRadius: BorderRadius.circular(20),
                             )),
                         onPressed: () async{
-                          print("Xác nhận thanh toán");
-                          await makePayment(invoice.gia.toString(), "VND");
+                          // print("Xác nhận thanh toán");
+                          await makePayment(invoice.gia.toString(), "VND", invoice);
                           // Navigator.of(context).push(
                           //     MaterialPageRoute(builder: (context) => PaymentScreen()
                           //     ));
@@ -174,38 +173,97 @@ class InvoiceInfoState extends State<InvoiceInfo>{
                     ],
                   ),
                 )
-              : const Text("")
+              : FutureBuilder(
+                  future: getHinhThucThanhToan(),
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    if (snapshot.connectionState != ConnectionState.done) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Text("Something Wrong");
+                    }
+                    if (snapshot.hasData) {
+                      return Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text("Hình thức thanh toán:", style: headerStyle),
+                            const SizedBox(width: 5),
+                            Text(snapshot.data, style: contentStyle),
+                          ],
+                        ),
+                      );
+                    }
+                    return Text("Error while Calling API");
+                  },
+                )
         ],
       ),
     );
   }
 
-  Future<void> makePayment(String amount, String currency) async {
+  Future<String> getHinhThucThanhToan() async {
+    final url = Uri.http(urlAPI, 'api/MobileApp/PaymentType/${invoice.idHoaDon}');
+    final resp = await http.get(url, headers: {
+      // "Access-Control-Allow-Origin": "*",
+      // "Access-Control-Allow-Credentials": "true",
+      "Content-type": "application/json",
+      // "Accept": "application/json"
+    });
+    print(resp.body);
+    final response = resp.body;
+    return response;
+  }
+
+  Future<void> makePayment(String amount, String currency, Invoice invoice) async {
     try {
       paymentIntent = await createPaymentIntent(amount, currency);
       //Payment Sheet
       await Stripe.instance.initPaymentSheet(
-          paymentSheetParameters: SetupPaymentSheetParameters(
+            paymentSheetParameters: SetupPaymentSheetParameters(
               paymentIntentClientSecret: paymentIntent!['client_secret'],
               // applePay: const PaymentSheetApplePay(merchantCountryCode: '+92',),
               // googlePay: const PaymentSheetGooglePay(testEnv: true, currencyCode: "US", merchantCountryCode: "+92"),
               style: ThemeMode.dark,
-              merchantDisplayName: 'Adnan')).then((value){
-      });
-
+              merchantDisplayName: 'Flutter Stripe Payment Demo',
+              // appearance: PaymentSheetAppearance(
+              //   colors: PaymentSheetAppearanceColors(
+              //     background: Colors.lightBlue,
+              //     primary: Colors.blue,
+              //     componentBorder: Colors.red,
+              //   ),
+              //   shapes: PaymentSheetShape(
+              //     borderRadius: 10,
+              //     borderWidth: 10,
+              //     shadow: PaymentSheetShadowParams(color: Colors.red),
+              //   ),
+              //   primaryButton: PaymentSheetPrimaryButtonAppearance(
+              //     shapes: PaymentSheetPrimaryButtonShape(blurRadius: 8),
+              //     colors: PaymentSheetPrimaryButtonTheme(
+              //       light: PaymentSheetPrimaryButtonThemeColors(
+              //         background: Color.fromARGB(255, 36, 101, 58),
+              //         text: Color.fromARGB(255, 235, 92, 30),
+              //         border: Color.fromARGB(255, 235, 92, 30),
+              //       ),
+              //     ),
+              //   ),
+              // ),
+            ),
+          ).then((value) {});
 
       ///now finally display payment sheeet
-      displayPaymentSheet();
+      displayPaymentSheet(invoice: invoice);
     } catch (e, s) {
-      print('exception:$e$s');
+      // print('exception:$e$s');
     }
   }
 
-  displayPaymentSheet() async {
+  displayPaymentSheet({required Invoice invoice}) async {
 
     try {
       await Stripe.instance.presentPaymentSheet(
-      ).then((value){
+      ).then((value) async{
         showDialog(
             context: context,
             builder: (_) => AlertDialog(
@@ -221,24 +279,35 @@ class InvoiceInfoState extends State<InvoiceInfo>{
                 ],
               ),
             ));
-        // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("paid successfully")));
 
+        final url = Uri.http(urlAPI, 'api/MobileApp/payment');
+
+        var jsonBody = {
+          'IDHoaDon': invoice.idHoaDon,
+          'IDAccount': invoice.idAccount
+        };
+        String jsonStr = json.encode(jsonBody);
+        final resp = await http.put(url, body: jsonStr, headers: {
+          // "Access-Control-Allow-Origin": "*",
+          // "Access-Control-Allow-Credentials": "true",
+          "Content-type": "application/json",
+          // "Accept": "application/json"
+        });
         paymentIntent = null;
-
       }).onError((error, stackTrace){
-        print('Error is:--->$error $stackTrace');
+        // print('Error is:--->$error $stackTrace');
       });
 
 
     } on StripeException catch (e) {
-      print('Error is:---> $e');
+      // print('Error is:---> $e');
       showDialog(
           context: context,
           builder: (_) => const AlertDialog(
             content: Text("Cancelled "),
           ));
     } catch (e) {
-      print('$e');
+      // print('$e');
     }
   }
 
@@ -264,12 +333,13 @@ class InvoiceInfoState extends State<InvoiceInfo>{
       return jsonDecode(response.body);
     } catch (err) {
       // ignore: avoid_print
-      print('err charging user: ${err.toString()}');
+      // print('err charging user: ${err.toString()}');
     }
   }
 
-  calculateAmount(String amount) {
-    final calculatedAmout = (int.parse(amount)) *15000 ;
-    return calculatedAmout.toString();
-  }
+  // calculateAmount(String amount) {
+  //   final calculatedAmout = (int.parse(amount)) *15000 ;
+  //   return calculatedAmout.toString();
+  // }
+
 }

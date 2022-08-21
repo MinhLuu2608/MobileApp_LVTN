@@ -1,6 +1,6 @@
 import 'package:MobileApp_LVTN/constants.dart';
 import 'package:MobileApp_LVTN/models/invoice.dart';
-import 'package:MobileApp_LVTN/screens/invoice_info.dart';
+import 'package:MobileApp_LVTN/screens/customer/invoice_info.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
@@ -14,8 +14,8 @@ class ExpansionList extends StatefulWidget {
 }
 
 class _ExpansionListState extends State<ExpansionList> {
-  static const TextStyle optionMainStyle = TextStyle(fontSize: 16);
-  static const TextStyle optionSubStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.bold);
+  // static const TextStyle optionMainStyle = TextStyle(fontSize: 16);
+  // static const TextStyle optionSubStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.bold);
 
   late Box box1;
 
