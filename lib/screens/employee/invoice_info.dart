@@ -23,6 +23,8 @@ class InvoiceInfoState extends State<InvoiceInfo>{
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  var updateState = false;
+
   static const TextStyle headerStyle = TextStyle(fontSize: 18, fontWeight: FontWeight.bold);
   static const TextStyle contentStyle = TextStyle(fontSize: 20,);
   static const TextStyle chuaThuStyle = TextStyle(fontSize: 20, color: Colors.pink);
@@ -153,13 +155,39 @@ class InvoiceInfoState extends State<InvoiceInfo>{
                               borderRadius: BorderRadius.circular(20),
                             )),
                         onPressed: () async{
-                          var response = await handleConfirm(
-                              idHoaDon: invoice.idHoaDon,
-                              idNhanVien: invoice.idNhanVien,
-                              idTuyenThu: invoice.idTuyenThu
-                          );
-                          final snackBar = SnackBar(content: Text(response));
-                          _scaffoldKey.currentState!.showSnackBar(snackBar);
+                          if(await checkAbleToPay(invoice.idHoaDon)){
+                            var response = await handleConfirm(
+                                idHoaDon: invoice.idHoaDon,
+                                idNhanVien: invoice.idNhanVien,
+                                idTuyenThu: invoice.idTuyenThu
+                            );
+                            final snackBar = SnackBar(content: Text(response));
+                            _scaffoldKey.currentState!.showSnackBar(snackBar);
+                            setState(() {
+                              updateState = !updateState;
+                            });
+                          }
+                          else{
+                            showDialog(
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: const [
+                                          Icon(Icons.warning_amber, color: Colors.amber,),
+                                          Flexible(
+                                            child: Text("Hoá đơn trước chưa thanh toán", style: TextStyle(fontSize: 18),),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ));
+                          }
                         },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -203,6 +231,24 @@ class InvoiceInfoState extends State<InvoiceInfo>{
         ],
       ),
     );
+  }
+
+  checkAbleToPay(int idHoaDon) async{
+    final url = Uri.http(urlAPI, 'api/MobileApp/isAbleToPay/$idHoaDon');
+    final resp = await http.get(url, headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": "true",
+      "Content-type": "application/json",
+      "Accept": "application/json"
+    });
+    final response = resp.body;
+
+    if(response == "true") {
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 
   Future<String> getHinhThucThanhToan() async {

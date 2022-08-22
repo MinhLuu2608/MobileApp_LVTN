@@ -9,7 +9,7 @@ import 'dart:convert';
 final urlAPI = url;
 
 class InvoiceInfo extends StatefulWidget{
-  Invoice invoice;
+  final Invoice invoice;
   InvoiceInfo({required this.invoice});
   @override
   InvoiceInfoState createState() => InvoiceInfoState(invoice: invoice);
@@ -18,6 +18,8 @@ class InvoiceInfo extends StatefulWidget{
 class InvoiceInfoState extends State<InvoiceInfo>{
   Invoice invoice;
   InvoiceInfoState({required this.invoice});
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   static const TextStyle headerStyle = TextStyle(fontSize: 18, fontWeight: FontWeight.bold);
   static const TextStyle contentStyle = TextStyle(fontSize: 20,);
@@ -28,6 +30,7 @@ class InvoiceInfoState extends State<InvoiceInfo>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: const Padding(padding: EdgeInsets.only(left: 50), child: Text('Chi tiết hoá đơn')),
       ),
@@ -149,11 +152,32 @@ class InvoiceInfoState extends State<InvoiceInfo>{
                             )),
                         onPressed: () async{
                           // print("Xác nhận thanh toán");
-                          await makePayment(invoice.gia.toString(), "VND", invoice);
-                          // Navigator.of(context).push(
-                          //     MaterialPageRoute(builder: (context) => PaymentScreen()
-                          //     ));
-                          // paymentController.makePayment(amount: '5', currency: 'USD');
+                          if( await checkAbleToPay(invoice.idHoaDon)){
+                            await makePayment(invoice.gia.toString(), "VND", invoice);
+                          }
+                          else{
+                            showDialog(
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: const [
+                                          Icon(Icons.warning_amber, color: Colors.amber,),
+                                          Flexible(
+                                            child: Text("Hoá đơn trước chưa thanh toán", style: TextStyle(fontSize: 18),),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ));
+                          }
+                          // Navigator.pop(context);
+                          // widget.reRender;
                         },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -201,6 +225,24 @@ class InvoiceInfoState extends State<InvoiceInfo>{
         ],
       ),
     );
+  }
+
+  checkAbleToPay(int idHoaDon) async{
+    final url = Uri.http(urlAPI, 'api/MobileApp/isAbleToPay/$idHoaDon');
+    final resp = await http.get(url, headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": "true",
+      "Content-type": "application/json",
+      "Accept": "application/json"
+    });
+    final response = resp.body;
+
+    if(response == "true") {
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 
   Future<String> getHinhThucThanhToan() async {
@@ -253,6 +295,7 @@ class InvoiceInfoState extends State<InvoiceInfo>{
 
       ///now finally display payment sheeet
       displayPaymentSheet(invoice: invoice);
+
     } catch (e, s) {
       // print('exception:$e$s');
     }
@@ -263,6 +306,19 @@ class InvoiceInfoState extends State<InvoiceInfo>{
     try {
       await Stripe.instance.presentPaymentSheet(
       ).then((value) async{
+        final url = Uri.http(urlAPI, 'api/MobileApp/payment');
+        var jsonBody = {
+          'IDHoaDon': invoice.idHoaDon,
+          'IDAccount': invoice.idAccount
+        };
+        String jsonStr = json.encode(jsonBody);
+        final resp = await http.put(url, body: jsonStr, headers: {
+          // "Access-Control-Allow-Origin": "*",
+          // "Access-Control-Allow-Credentials": "true",
+          "Content-type": "application/json",
+          // "Accept": "application/json"
+        });
+        Navigator.pop(context);
         showDialog(
             context: context,
             builder: (_) => AlertDialog(
@@ -278,20 +334,6 @@ class InvoiceInfoState extends State<InvoiceInfo>{
                 ],
               ),
             ));
-
-        final url = Uri.http(urlAPI, 'api/MobileApp/payment');
-
-        var jsonBody = {
-          'IDHoaDon': invoice.idHoaDon,
-          'IDAccount': invoice.idAccount
-        };
-        String jsonStr = json.encode(jsonBody);
-        final resp = await http.put(url, body: jsonStr, headers: {
-          // "Access-Control-Allow-Origin": "*",
-          // "Access-Control-Allow-Credentials": "true",
-          "Content-type": "application/json",
-          // "Accept": "application/json"
-        });
         paymentIntent = null;
       }).onError((error, stackTrace){
         // print('Error is:--->$error $stackTrace');

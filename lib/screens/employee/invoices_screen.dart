@@ -28,7 +28,7 @@ class InvoicesScreenState extends State<InvoicesScreen>{
   void initState() {
     // TODO: implement initState
     super.initState();
-    this.radioValue = 1;
+    this.radioValue = 0;
     createOpenBox();
   }
   void createOpenBox() async{
@@ -54,6 +54,18 @@ class InvoicesScreenState extends State<InvoicesScreen>{
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         RadioListTile(
+                          title: Text("Kỳ thu"),
+                          value: 0,
+                          groupValue: _value,
+                          onChanged: (value) {
+                            setState(() {
+                              _value = int.parse(value.toString());
+                              print("Value change: ${_value.toString()}");
+                              // print(radioValue);
+                            });
+                          },
+                        ), // Kỳ thu
+                        RadioListTile(
                           title: Text("Tuyến thu"),
                           value: 1,
                           groupValue: _value,
@@ -64,7 +76,7 @@ class InvoicesScreenState extends State<InvoicesScreen>{
                               // print(radioValue);
                             });
                           },
-                        ), //Tuyến thu
+                        ), // Tuyến thu
                         RadioListTile(
                           title: Text("Khách hàng"),
                           value: 2,
@@ -77,6 +89,18 @@ class InvoicesScreenState extends State<InvoicesScreen>{
                             });
                           },
                         ), // Khách hàng
+                        RadioListTile(
+                          title: Text("Tình trạng"),
+                          value: 2,
+                          groupValue: _value,
+                          onChanged: (value) {
+                            setState(() {
+                              _value = int.parse(value.toString());
+                              print("Value change: ${_value.toString()}");
+                              // print(radioValue);
+                            });
+                          },
+                        ), // Tình trạng
                       ],
                     ),
                     actions: [
