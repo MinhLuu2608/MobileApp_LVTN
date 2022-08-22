@@ -28,7 +28,7 @@ class InvoicesScreenState extends State<InvoicesScreen>{
   void initState() {
     // TODO: implement initState
     super.initState();
-    this.radioValue = 0;
+    this.radioValue = 1;
     createOpenBox();
   }
   void createOpenBox() async{
@@ -43,7 +43,7 @@ class InvoicesScreenState extends State<InvoicesScreen>{
         tooltip: "Thêm liên kết tài khoản",
         child: Icon(Icons.filter_alt_rounded),
         onPressed: () async{
-          // await openFilterDialog(context);
+          int _value = radioValue;
           await showDialog(
               context: context,
               builder: (context) {
@@ -54,45 +54,36 @@ class InvoicesScreenState extends State<InvoicesScreen>{
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         RadioListTile(
-                          title: Text("Tình trạng"),
-                          subtitle: Text("Đã thu / Chưa thu"),
-                          value: 0,
-                          groupValue: radioValue,
+                          title: Text("Tuyến thu"),
+                          value: 1,
+                          groupValue: _value,
                           onChanged: (value) {
                             setState(() {
-                              radioValue = int.parse(value.toString());
+                              _value = int.parse(value.toString());
+                              print("Value change: ${_value.toString()}");
                               // print(radioValue);
                             });
                           },
-                        ), // Tình trạng thu
+                        ), //Tuyến thu
                         RadioListTile(
                           title: Text("Khách hàng"),
-                          value: 1,
-                          groupValue: radioValue,
-                          onChanged: (value) {
-                            setState(() {
-                              radioValue = int.parse(value.toString());
-                              // print(radioValue);
-                            });
-                          },
-                        ), //Khách hàng
-                        RadioListTile(
-                          title: Text("Tuyến thu"),
                           value: 2,
-                          groupValue: radioValue,
+                          groupValue: _value,
                           onChanged: (value) {
                             setState(() {
-                              radioValue = int.parse(value.toString());
+                              _value = int.parse(value.toString());
+                              print("Value change: ${_value.toString()}");
                               // print(radioValue);
                             });
                           },
-                        ), // Tuyến thu
+                        ), // Khách hàng
                       ],
                     ),
                     actions: [
                       TextButton(
                           onPressed: () {
                             Navigator.of(context).pop();
+                            radioValue = _value;
                             this.setState(() {
                               updateState = !updateState;
                             });
@@ -110,12 +101,7 @@ class InvoicesScreenState extends State<InvoicesScreen>{
           );
         },
       ),
-      body: Column(
-        children: [
-          Text(radioValue.toString()),
-          InvoicesList(filterType: radioValue),
-        ],
-      ),
+      body: InvoicesList(filterType: radioValue),
     );
   }
 
