@@ -211,7 +211,6 @@ class InvoiceInfoState extends State<InvoiceInfo>{
       "Content-type": "application/json",
       // "Accept": "application/json"
     });
-    print(resp.body);
     final response = resp.body;
     return response;
   }

@@ -1,3 +1,4 @@
+import 'package:MobileApp_LVTN/screens/employee/emp_info.dart';
 import 'invoices_screen.dart';
 import 'package:MobileApp_LVTN/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
@@ -14,13 +15,13 @@ class _EmpHomeScreenState extends State<EmpHomeScreen>{
   static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
   List<Widget> title = [
-    Text('Trang chủ', style: optionStyle),
+    Text('Thông tin nhân viên', style: optionStyle),
     Text('Hoá đơn', style: optionStyle),
     Text('Cài đặt', style: optionStyle),
   ];
 
   List<Widget> screens = [
-    Text('Home Nhân viên', style: optionStyle),
+    EmpInfo(),
     InvoicesScreen(),
     SettingsScreen(),
   ];

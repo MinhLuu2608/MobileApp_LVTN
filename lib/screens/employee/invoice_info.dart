@@ -11,6 +11,7 @@ final urlAPI = url;
 class InvoiceInfo extends StatefulWidget{
   Invoice invoice;
   InvoiceInfo({required this.invoice});
+
   @override
   InvoiceInfoState createState() => InvoiceInfoState(invoice: invoice);
 }
@@ -211,7 +212,6 @@ class InvoiceInfoState extends State<InvoiceInfo>{
       "Content-type": "application/json",
       // "Accept": "application/json"
     });
-    print(resp.body);
     final response = resp.body;
     return response;
   }

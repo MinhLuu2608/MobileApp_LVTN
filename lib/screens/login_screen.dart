@@ -33,7 +33,7 @@ class LoginScreen extends State<LoginPage> {
   }
   void createOpenBox() async{
     box1 = await Hive.openBox('logindata');
-    box1.put("IDAccount", "-1");
+    box1.put("IDAccount", -1);
     getData();
   }
 
@@ -76,7 +76,6 @@ class LoginScreen extends State<LoginPage> {
   }
 
   SingleChildScrollView loginForm(BuildContext context) {
-    // final userAccountProvider = Provider.of<UserAccount_provider>(context);
 
     checkLogin(String username, String password) async{
       final url = Uri.http(urlAPI, 'api/MobileApp/$username/$password');
@@ -226,10 +225,12 @@ class LoginScreen extends State<LoginPage> {
                           else{
                             if( await checkLogin(txtUsername.text, txtPassword.text) ){
                               rememberPassword(txtUsername.text, txtPassword.text);
-                              setIDAccount(txtUsername.text, txtPassword.text);
-                              setIDNhanVien();
+                              await setIDAccount(txtUsername.text, txtPassword.text);
+                              await setIDNhanVien();
                               final snackBar = SnackBar(content: Text("Đăng nhập thành công"));
                               _scaffoldKey.currentState!.showSnackBar(snackBar);
+                              print("IDAccount : ${box1.get("IDAccount").toString()}");
+                              print("IDNhanVien: ${box1.get("IDNhanVien").toString()}");
                               if(box1.get("IDNhanVien") == -1){
                                 Navigator.pushReplacementNamed(context, 'customer/home');
                               }
