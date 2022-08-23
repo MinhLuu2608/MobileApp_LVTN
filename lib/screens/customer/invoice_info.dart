@@ -9,23 +9,45 @@ import 'dart:convert';
 final urlAPI = url;
 
 class InvoiceInfo extends StatefulWidget{
-  final Invoice invoice;
-  InvoiceInfo({required this.invoice});
+  final int idHoaDon;
+  InvoiceInfo({required this.idHoaDon});
   @override
-  InvoiceInfoState createState() => InvoiceInfoState(invoice: invoice);
+  InvoiceInfoState createState() => InvoiceInfoState(idHoaDon: idHoaDon);
 }
 
 class InvoiceInfoState extends State<InvoiceInfo>{
-  Invoice invoice;
-  InvoiceInfoState({required this.invoice});
+  final int idHoaDon;
+  InvoiceInfoState({required this.idHoaDon});
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  var updateState = false;
 
   static const TextStyle headerStyle = TextStyle(fontSize: 18, fontWeight: FontWeight.bold);
   static const TextStyle contentStyle = TextStyle(fontSize: 20,);
   static const TextStyle chuaThuStyle = TextStyle(fontSize: 20, color: Colors.pink);
 
   Map<String, dynamic>? paymentIntent;
+
+  Future<List<Invoice>> getHoaDonInfo() async {
+    final url = Uri.http(urlAPI, 'api/MobileApp/customerHoaDonInfo/$idHoaDon');
+
+    final resp = await http.get(url, headers: {
+      // "Access-Control-Allow-Origin": "*",
+      // "Access-Control-Allow-Credentials": "true",
+      "Content-type": "application/json",
+      // "Accept": "application/json"
+    });
+    final response = invoiceFromJson(resp.body);
+    return response;
+  }
+
+
+  Future refresh() async{
+    setState(() {
+      updateState = !updateState;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,111 +56,121 @@ class InvoiceInfoState extends State<InvoiceInfo>{
       appBar: AppBar(
         title: const Padding(padding: EdgeInsets.only(left: 50), child: Text('Chi tiết hoá đơn')),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Center(
-                child: Text(
-                    "Hoá đơn tháng ${invoice.thang}",
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)
-                )
-            ),
-          ), // Title hoá đơn
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
+      body: FutureBuilder(
+        future: getHoaDonInfo(),
+        builder: (BuildContext context, AsyncSnapshot snapshot){
+          if(snapshot.connectionState != ConnectionState.done){
+            return Center(child: CircularProgressIndicator());
+          }
+          if(snapshot.hasError){
+            return Text("Something Wrong");
+          }
+          if(snapshot.hasData){
+            return Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const Text("Mã số phiếu:",style: headerStyle,),
-                const SizedBox(width: 5),
-                Text(invoice.maSoPhieu, style: contentStyle),
-              ],
-            ),
-          ), // Mã số phiếu
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const Text("Mã khách hàng:", style: headerStyle),
-                const SizedBox(width: 5),
-                Text(invoice.maKH, style: contentStyle),
-              ],
-            ),
-          ), // Mã khách hàng
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const Text("Tên khách hàng:", style: headerStyle),
-                const SizedBox(width: 5),
-                Text(invoice.hoTenKH, style: contentStyle),
-              ],
-            ),
-          ), // Tên khách hàng
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const Text("Loại khách hàng:", style: headerStyle),
-                const SizedBox(width: 5),
-                Text(invoice.tenLoai, style: contentStyle),
-              ],
-            ),
-          ), // Loại khách hàng
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text("Địa chỉ:", style: headerStyle),
-                const SizedBox(width: 5),
-                Flexible(child: Text(invoice.diaChiKH, style: contentStyle)),
-              ],
-            ),
-          ), // Địa chỉ khách hàng
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const Text("Ngày tạo hoá đơn:", style: headerStyle),
-                const SizedBox(width: 5),
-                Text(invoice.ngayTao, style: contentStyle),
-              ],
-            ),
-          ), // Ngày tạo
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text("Ngày thu:", style: headerStyle),
-                const SizedBox(width: 5),
-                invoice.ngayThu == "Chưa thu"
-                    ? Text(invoice.ngayThu, style: chuaThuStyle)
-                    : Text(invoice.ngayThu, style: contentStyle)
-              ],
-            ),
-          ), // Ngày thu
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text("Giá:", style: headerStyle),
-                const SizedBox(width: 5),
-                Text(invoice.gia.toString() + "đ", style: contentStyle),
-              ],
-            ),
-          ), // Giá
-          invoice.ngayThu == "Chưa thu"
-              ? Expanded(
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Center(
+                      child: Text(
+                          "Hoá đơn tháng ${snapshot.data[0].thang}",
+                          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)
+                      )
+                  ),
+                ), // Title hoá đơn
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Text("Mã số phiếu:",style: headerStyle,),
+                      const SizedBox(width: 5),
+                      Text(snapshot.data[0].maSoPhieu, style: contentStyle),
+                    ],
+                  ),
+                ), // Mã số phiếu
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Text("Mã khách hàng:", style: headerStyle),
+                      const SizedBox(width: 5),
+                      Text(snapshot.data[0].maKH, style: contentStyle),
+                    ],
+                  ),
+                ), // Mã khách hàng
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Text("Tên khách hàng:", style: headerStyle),
+                      const SizedBox(width: 5),
+                      Text(snapshot.data[0].hoTenKH, style: contentStyle),
+                    ],
+                  ),
+                ), // Tên khách hàng
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Text("Loại khách hàng:", style: headerStyle),
+                      const SizedBox(width: 5),
+                      Text(snapshot.data[0].tenLoai, style: contentStyle),
+                    ],
+                  ),
+                ), // Loại khách hàng
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("Địa chỉ:", style: headerStyle),
+                      const SizedBox(width: 5),
+                      Flexible(child: Text(snapshot.data[0].diaChiKH, style: contentStyle)),
+                    ],
+                  ),
+                ), // Địa chỉ khách hàng
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Text("Ngày tạo hoá đơn:", style: headerStyle),
+                      const SizedBox(width: 5),
+                      Text(snapshot.data[0].ngayTao, style: contentStyle),
+                    ],
+                  ),
+                ), // Ngày tạo
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text("Ngày thu:", style: headerStyle),
+                      const SizedBox(width: 5),
+                      snapshot.data[0].ngayThu == "Chưa thu"
+                          ? Text(snapshot.data[0].ngayThu, style: chuaThuStyle)
+                          : Text(snapshot.data[0].ngayThu, style: contentStyle)
+                    ],
+                  ),
+                ), // Ngày thu
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text("Giá:", style: headerStyle),
+                      const SizedBox(width: 5),
+                      Text(snapshot.data[0].gia.toString() + "đ", style: contentStyle),
+                    ],
+                  ),
+                ), // Giá
+                snapshot.data[0].ngayThu == "Chưa thu"
+                    ? Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -152,8 +184,8 @@ class InvoiceInfoState extends State<InvoiceInfo>{
                             )),
                         onPressed: () async{
                           // print("Xác nhận thanh toán");
-                          if( await checkAbleToPay(invoice.idHoaDon)){
-                            await makePayment(invoice.gia.toString(), "VND", invoice);
+                          if( await checkAbleToPay(snapshot.data[0].idHoaDon)){
+                            await makePayment(snapshot.data[0].gia.toString(), "VND", snapshot.data[0]);
                           }
                           else{
                             showDialog(
@@ -197,8 +229,8 @@ class InvoiceInfoState extends State<InvoiceInfo>{
                     ],
                   ),
                 )
-              : FutureBuilder(
-                  future: getHinhThucThanhToan(),
+                    : FutureBuilder(
+                  future: getHinhThucThanhToan(snapshot.data[0].idHoaDon),
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (snapshot.connectionState != ConnectionState.done) {
                       return Center(child: CircularProgressIndicator());
@@ -222,7 +254,11 @@ class InvoiceInfoState extends State<InvoiceInfo>{
                     return Text("Error while Calling API");
                   },
                 )
-        ],
+              ],
+            );
+          }
+          return Text("Error while Calling API");
+        },
       ),
     );
   }
@@ -245,8 +281,8 @@ class InvoiceInfoState extends State<InvoiceInfo>{
     }
   }
 
-  Future<String> getHinhThucThanhToan() async {
-    final url = Uri.http(urlAPI, 'api/MobileApp/PaymentType/${invoice.idHoaDon}');
+  Future<String> getHinhThucThanhToan(int idHoaDon) async {
+    final url = Uri.http(urlAPI, 'api/MobileApp/PaymentType/$idHoaDon');
     final resp = await http.get(url, headers: {
       // "Access-Control-Allow-Origin": "*",
       // "Access-Control-Allow-Credentials": "true",
@@ -318,7 +354,6 @@ class InvoiceInfoState extends State<InvoiceInfo>{
           "Content-type": "application/json",
           // "Accept": "application/json"
         });
-        Navigator.pop(context);
         showDialog(
             context: context,
             builder: (_) => AlertDialog(
@@ -335,6 +370,9 @@ class InvoiceInfoState extends State<InvoiceInfo>{
               ),
             ));
         paymentIntent = null;
+        setState(() {
+          updateState = !updateState;
+        });
       }).onError((error, stackTrace){
         // print('Error is:--->$error $stackTrace');
       });

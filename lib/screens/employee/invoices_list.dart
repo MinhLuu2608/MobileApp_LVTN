@@ -84,7 +84,7 @@ class InvoicesListState extends State<InvoicesList> {
                     child: InkWell(
                       onTap: (){
                         Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => InvoiceInfo(invoice: snapshot.data[index])
+                            MaterialPageRoute(builder: (context) => InvoiceInfo(idHoaDon: snapshot.data[index].idHoaDon,)
                             ));
                       },
                       child: Card(
