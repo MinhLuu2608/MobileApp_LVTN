@@ -197,47 +197,15 @@ class InvoiceInfoState extends State<InvoiceInfo>{
                                   );
                                   showDialog(
                                       context: context,
-                                      builder: (_) => AlertDialog(
-                                        content: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                const Icon(Icons.check_circle_outline, color: Colors.green),
-                                                Flexible(child: Text(response, style: TextStyle(fontSize: 18)),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ));
+                                      builder: (_) => buildAlertDialogSuccess(response));
                                   setState(() {
                                     updateState = !updateState;
                                   });
-                                } else {
+                                }
+                                else {
                                   showDialog(
                                       context: context,
-                                      builder: (_) => AlertDialog(
-                                            content: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: const [
-                                                    Icon( Icons.warning_amber, color: Colors.amber),
-                                                    Flexible(
-                                                      child: Text(
-                                                        "Hoá đơn trước chưa thanh toán", style: TextStyle(fontSize: 18),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ));
+                                      builder: (_) => buildAlertDialogWarning());
                                 }
                               },
                               child: Row(
@@ -264,14 +232,99 @@ class InvoiceInfoState extends State<InvoiceInfo>{
                             return Text("Something Wrong");
                           }
                           if (snapshot.hasData) {
-                            return Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: Row(
+                            return Expanded(
+                              child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  const Text("Hình thức thanh toán:", style: headerStyle),
-                                  const SizedBox(width: 5),
-                                  Text(snapshot.data, style: contentStyle),
+                                  Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        const Text("Hình thức thanh toán:", style: headerStyle),
+                                        const SizedBox(width: 5),
+                                        Text(snapshot.data, style: contentStyle),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        OutlinedButton(
+                                          style: OutlinedButton.styleFrom(
+                                              backgroundColor: Colors.greenAccent,
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 20, vertical: 20),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(20),
+                                              )),
+                                          onPressed: () async {
+                                            // if (await checkAbleToPay(
+                                            //     snapshot.data[0].idHoaDon)) {
+                                            //   var response = await handleConfirm(
+                                            //       idHoaDon: snapshot.data[0].idHoaDon,
+                                            //       idNhanVien: snapshot.data[0].idNhanVien,
+                                            //       idTuyenThu: snapshot.data[0].idTuyenThu
+                                            //   );
+                                            //   showDialog(
+                                            //       context: context,
+                                            //       builder: (_) => AlertDialog(
+                                            //         content: Column(
+                                            //           mainAxisSize: MainAxisSize.min,
+                                            //           children: [
+                                            //             Row(
+                                            //               mainAxisAlignment: MainAxisAlignment.start,
+                                            //               crossAxisAlignment: CrossAxisAlignment.start,
+                                            //               children: [
+                                            //                 const Icon(Icons.check_circle_outline, color: Colors.green),
+                                            //                 Flexible(child: Text(response, style: TextStyle(fontSize: 18)),
+                                            //                 ),
+                                            //               ],
+                                            //             ),
+                                            //           ],
+                                            //         ),
+                                            //       ));
+                                            //   setState(() {
+                                            //     updateState = !updateState;
+                                            //   });
+                                            // }
+                                            // else {
+                                            //   showDialog(
+                                            //       context: context,
+                                            //       builder: (_) => AlertDialog(
+                                            //         content: Column(
+                                            //           mainAxisSize: MainAxisSize.min,
+                                            //           children: [
+                                            //             Row(
+                                            //               mainAxisAlignment: MainAxisAlignment.start,
+                                            //               crossAxisAlignment: CrossAxisAlignment.start,
+                                            //               children: const [
+                                            //                 Icon( Icons.warning_amber, color: Colors.amber),
+                                            //                 Flexible(
+                                            //                   child: Text(
+                                            //                     "Hoá đơn trước chưa thanh toán", style: TextStyle(fontSize: 18),
+                                            //                   ),
+                                            //                 ),
+                                            //               ],
+                                            //             ),
+                                            //           ],
+                                            //         ),
+                                            //       ));
+                                            // }
+                                          },
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: const [
+                                              Text("In hoá đơn", style: TextStyle(fontSize: 22, letterSpacing: 2.2, color: Colors.blue)),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20)
+                                      ],
+                                    ),
+                                  )
                                 ],
                               ),
                             );
@@ -284,6 +337,42 @@ class InvoiceInfoState extends State<InvoiceInfo>{
           }
           return Text("Error while Calling API");
         },
+      ),
+    );
+  }
+
+  AlertDialog buildAlertDialogWarning() {
+    return AlertDialog(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Icon(Icons.warning_amber, color: Colors.amber),
+              Flexible(child: Text( "Hoá đơn trước chưa thanh toán", style: TextStyle(fontSize: 18)))
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  AlertDialog buildAlertDialogSuccess(response) {
+    return AlertDialog(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.check_circle_outline, color: Colors.green),
+              Flexible(child: Text(response, style: TextStyle(fontSize: 18)))
+            ],
+          ),
+        ],
       ),
     );
   }
