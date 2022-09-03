@@ -23,7 +23,7 @@ class InvoiceInfoState extends State<InvoiceInfo>{
 
   var updateState = false;
 
-  static const TextStyle headerStyle = TextStyle(fontSize: 18, fontWeight: FontWeight.bold);
+  static const TextStyle headerStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
   static const TextStyle contentStyle = TextStyle(fontSize: 20,);
   static const TextStyle chuaThuStyle = TextStyle(fontSize: 20, color: Colors.pink);
 

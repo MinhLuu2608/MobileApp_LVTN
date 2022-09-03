@@ -1,26 +1,25 @@
 import 'dart:convert';
 import 'package:MobileApp_LVTN/constants.dart';
-import 'package:MobileApp_LVTN/screens/employee/invoices_list.dart';
+import 'package:MobileApp_LVTN/screens/employee_thutien/invoice_filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 final urlAPI = url;
-class InvoicesScreen extends StatefulWidget{
+class InvoiceScreen extends StatefulWidget{
   // InvoicesScreen({Key? key}) : super (key: key);
 
   @override
-  InvoicesScreenState createState() => InvoicesScreenState();
+  InvoiceScreenState createState() => InvoiceScreenState();
 }
 
-class InvoicesScreenState extends State<InvoicesScreen>{
+class InvoiceScreenState extends State<InvoiceScreen>{
 
   late int radioValue;
   var updateState = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final formKey = GlobalKey<FormState>();
-  var txtMaKhachHang = TextEditingController();
 
   late Box box1;
 
@@ -40,7 +39,7 @@ class InvoicesScreenState extends State<InvoicesScreen>{
     return Scaffold(
       key: _scaffoldKey,
       floatingActionButton: FloatingActionButton(
-        tooltip: "Thêm liên kết tài khoản",
+        tooltip: "Lọc",
         child: Icon(Icons.filter_alt_rounded),
         onPressed: () async{
           int _value = radioValue;
@@ -54,49 +53,45 @@ class InvoicesScreenState extends State<InvoicesScreen>{
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         RadioListTile(
-                          title: Text("Kỳ thu"),
+                          title: Text("Kỳ thu", style: TextStyle(fontSize: 20)),
                           value: 0,
                           groupValue: _value,
                           onChanged: (value) {
                             setState(() {
                               _value = int.parse(value.toString());
-                              print("Value change: ${_value.toString()}");
                               // print(radioValue);
                             });
                           },
                         ), // Kỳ thu
                         RadioListTile(
-                          title: Text("Tuyến thu"),
+                          title: Text("Tuyến thu", style: TextStyle(fontSize: 20)),
                           value: 1,
                           groupValue: _value,
                           onChanged: (value) {
                             setState(() {
                               _value = int.parse(value.toString());
-                              print("Value change: ${_value.toString()}");
                               // print(radioValue);
                             });
                           },
                         ), // Tuyến thu
                         RadioListTile(
-                          title: Text("Khách hàng"),
+                          title: Text("Khách hàng", style: TextStyle(fontSize: 20)),
                           value: 2,
                           groupValue: _value,
                           onChanged: (value) {
                             setState(() {
                               _value = int.parse(value.toString());
-                              print("Value change: ${_value.toString()}");
                               // print(radioValue);
                             });
                           },
                         ), // Khách hàng
                         RadioListTile(
-                          title: Text("Tình trạng"),
+                          title: Text("Tình trạng", style: TextStyle(fontSize: 20)),
                           value: 3,
                           groupValue: _value,
                           onChanged: (value) {
                             setState(() {
                               _value = int.parse(value.toString());
-                              print("Value change: ${_value.toString()}");
                               // print(radioValue);
                             });
                           },
@@ -112,12 +107,12 @@ class InvoicesScreenState extends State<InvoicesScreen>{
                               updateState = !updateState;
                             });
                           },
-                          child: Text("Lọc")),
+                          child: Text("Lọc", style: TextStyle(fontSize: 20))),
                       TextButton(
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
-                          child: Text("Huỷ bỏ"))
+                          child: Text("Huỷ bỏ", style: TextStyle(fontSize: 20)))
                     ],
                   );
                 });
@@ -125,76 +120,8 @@ class InvoicesScreenState extends State<InvoicesScreen>{
           );
         },
       ),
-      body: InvoicesList(filterType: radioValue),
+      body: InvoiceFilterList(filterType: radioValue),
     );
   }
-
-  // openFilterDialog(BuildContext context) {
-  //   showDialog(
-  //           context: context,
-  //           builder: (context) {
-  //             return StatefulBuilder(builder: (context, setState) {
-  //               return AlertDialog(
-  //                 title: Center(child: Text("Lọc hoá đơn theo")),
-  //                 content: Column(
-  //                   mainAxisSize: MainAxisSize.min,
-  //                   children: [
-  //                     RadioListTile(
-  //                       title: Text("Tình trạng"),
-  //                       subtitle: Text("Đã thu / Chưa thu"),
-  //                       value: 0,
-  //                       groupValue: radioValue,
-  //                       onChanged: (value) {
-  //                         setState(() {
-  //                           radioValue = int.parse(value.toString());
-  //                           print(radioValue);
-  //                         });
-  //                       },
-  //                     ), // Tình trạng thu
-  //                     RadioListTile(
-  //                       title: Text("Khách hàng"),
-  //                       value: 1,
-  //                       groupValue: _radioValue,
-  //                       onChanged: (value) {
-  //                         setState(() {
-  //                           _radioValue = int.parse(value.toString());
-  //                           print(_radioValue);
-  //                         });
-  //                       },
-  //                     ), //Khách hàng
-  //                     RadioListTile(
-  //                       title: Text("Tuyến thu"),
-  //                       value: 2,
-  //                       groupValue: _radioValue,
-  //                       onChanged: (value) {
-  //                         setState(() {
-  //                           _radioValue = int.parse(value.toString());
-  //                           print(_radioValue);
-  //                         });
-  //                       },
-  //                     ), // Tuyến thu
-  //                   ],
-  //                 ),
-  //                 actions: [
-  //                   TextButton(
-  //                       onPressed: () {
-  //                         this.setState(() {
-  //                           updateState = !updateState;
-  //                         });
-  //                         Navigator.of(context).pop();
-  //                       },
-  //                       child: Text("Lọc")),
-  //                   TextButton(
-  //                       onPressed: () {
-  //                         Navigator.of(context).pop();
-  //                       },
-  //                       child: Text("Huỷ bỏ"))
-  //                 ],
-  //               );
-  //             });
-  //           }
-  //       );
-  // }
-
 
 }

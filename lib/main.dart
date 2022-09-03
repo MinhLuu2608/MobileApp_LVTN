@@ -1,4 +1,5 @@
-import 'package:MobileApp_LVTN/screens/employee/home_screen.dart';
+import 'package:MobileApp_LVTN/screens/employee_dichvu/home_screen.dart';
+import 'package:MobileApp_LVTN/screens/employee_thutien//home_screen.dart';
 import 'package:MobileApp_LVTN/screens/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:MobileApp_LVTN/screens/customer/home_screen.dart';
@@ -27,7 +28,8 @@ class MyApp extends StatelessWidget{
         'login' : (_) => LoginPage(),
         'register' : (_) => RegisterScreen(),
         'customer/home' : (_) => HomeScreen(),
-        'employee/home' : (_) => EmpHomeScreen(),
+        'employee_thutien/home' : (_) => EmpThuTienHomeScreen(),
+        'employee_dichvu/home' : (_) => EmpDichVuHomeScreen(),
       },
       initialRoute: 'login',
     );

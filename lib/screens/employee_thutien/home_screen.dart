@@ -1,16 +1,16 @@
-import 'package:MobileApp_LVTN/screens/employee/emp_info.dart';
-import 'invoices_screen.dart';
+import 'package:MobileApp_LVTN/screens/employee_thutien/emp_info.dart';
+import 'invoice_screen.dart';
 import 'package:MobileApp_LVTN/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 
-class EmpHomeScreen extends StatefulWidget{
-  EmpHomeScreen({Key? key}) : super (key: key);
+class EmpThuTienHomeScreen extends StatefulWidget{
+  EmpThuTienHomeScreen({Key? key}) : super (key: key);
 
   @override
   _EmpHomeScreenState createState() => _EmpHomeScreenState();
 }
 
-class _EmpHomeScreenState extends State<EmpHomeScreen>{
+class _EmpHomeScreenState extends State<EmpThuTienHomeScreen>{
   int _selectedIndex = 0;
   static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
@@ -22,7 +22,7 @@ class _EmpHomeScreenState extends State<EmpHomeScreen>{
 
   List<Widget> screens = [
     EmpInfo(),
-    InvoicesScreen(),
+    InvoiceScreen(),
     SettingsScreen(),
   ];
 

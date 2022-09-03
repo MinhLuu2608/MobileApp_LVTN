@@ -235,7 +235,8 @@ class LoginScreen extends State<LoginPage> {
                                 Navigator.pushReplacementNamed(context, 'customer/home');
                               }
                               else{
-                                Navigator.pushReplacementNamed(context, 'employee/home');
+                                // Navigator.pushReplacementNamed(context, 'employee_thutien/home');
+                                Navigator.pushReplacementNamed(context, 'employee_dichvu/home');
                               }
                             }
                             else{

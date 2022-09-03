@@ -17,7 +17,7 @@ class InvoicesList extends StatefulWidget{
 }
 
 class InvoicesListState extends State<InvoicesList> {
-  static const TextStyle optionMainStyle = TextStyle(fontSize: 16);
+  static const TextStyle optionMainStyle = TextStyle(fontSize: 20);
   static const TextStyle optionSubStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.bold);
 
   late Box box1;
@@ -99,15 +99,15 @@ class InvoicesListState extends State<InvoicesList> {
                               children: <Widget>[
                                 Padding(
                                   padding: const EdgeInsets.all(5.0),
-                                  child: Text(snapshot.data[index].maSoPhieu),
+                                  child: Text(snapshot.data[index].maSoPhieu, style: optionMainStyle,),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.all(5.0),
-                                  child: Text(snapshot.data[index].tenKyThu),
+                                  child: Text(snapshot.data[index].tenKyThu, style: optionMainStyle),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.all(5.0),
-                                  child: Text(snapshot.data[index].hoTenKH),
+                                  child: Text(snapshot.data[index].hoTenKH, style: optionMainStyle),
                                 ),
                               ],
                             ),
