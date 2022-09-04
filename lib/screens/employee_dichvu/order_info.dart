@@ -27,7 +27,7 @@ class OrderInfoState extends State<OrderInfo>{
   static const TextStyle chuaThuStyle = TextStyle(fontSize: 20, color: Colors.pink);
 
   Future<List<EmpInvoice>> getHoaDonInfo() async {
-    final url = Uri.http(urlAPI, 'api/MobileApp/empHoaDonInfo/$idHoaDon');
+    final url = Uri.http(urlAPI, 'api/MobileApp/empHoaDonInfo/$widget.idDonHang');
 
     final resp = await http.get(url, headers: {
       // "Access-Control-Allow-Origin": "*",
@@ -257,58 +257,7 @@ class OrderInfoState extends State<OrderInfo>{
                                                 borderRadius: BorderRadius.circular(20),
                                               )),
                                           onPressed: () async {
-                                            // if (await checkAbleToPay(
-                                            //     snapshot.data[0].idHoaDon)) {
-                                            //   var response = await handleConfirm(
-                                            //       idHoaDon: snapshot.data[0].idHoaDon,
-                                            //       idNhanVien: snapshot.data[0].idNhanVien,
-                                            //       idTuyenThu: snapshot.data[0].idTuyenThu
-                                            //   );
-                                            //   showDialog(
-                                            //       context: context,
-                                            //       builder: (_) => AlertDialog(
-                                            //         content: Column(
-                                            //           mainAxisSize: MainAxisSize.min,
-                                            //           children: [
-                                            //             Row(
-                                            //               mainAxisAlignment: MainAxisAlignment.start,
-                                            //               crossAxisAlignment: CrossAxisAlignment.start,
-                                            //               children: [
-                                            //                 const Icon(Icons.check_circle_outline, color: Colors.green),
-                                            //                 Flexible(child: Text(response, style: TextStyle(fontSize: 18)),
-                                            //                 ),
-                                            //               ],
-                                            //             ),
-                                            //           ],
-                                            //         ),
-                                            //       ));
-                                            //   setState(() {
-                                            //     updateState = !updateState;
-                                            //   });
-                                            // }
-                                            // else {
-                                            //   showDialog(
-                                            //       context: context,
-                                            //       builder: (_) => AlertDialog(
-                                            //         content: Column(
-                                            //           mainAxisSize: MainAxisSize.min,
-                                            //           children: [
-                                            //             Row(
-                                            //               mainAxisAlignment: MainAxisAlignment.start,
-                                            //               crossAxisAlignment: CrossAxisAlignment.start,
-                                            //               children: const [
-                                            //                 Icon( Icons.warning_amber, color: Colors.amber),
-                                            //                 Flexible(
-                                            //                   child: Text(
-                                            //                     "Hoá đơn trước chưa thanh toán", style: TextStyle(fontSize: 18),
-                                            //                   ),
-                                            //                 ),
-                                            //               ],
-                                            //             ),
-                                            //           ],
-                                            //         ),
-                                            //       ));
-                                            // }
+
                                           },
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.center,

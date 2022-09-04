@@ -78,105 +78,107 @@ class EmpInfoState extends State<EmpInfo>{
           return Text("Something Wrong");
         }
         if (snapshotNV.hasData) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(Icons.person, color: Colors.black12, size: 100)
-                ],
-              ), // Icon
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("Mã nhân viên:", style: headerStyle),
-                    const SizedBox(width: 5),
-                    Text(snapshotNV.data[0].maNhanVien, style: contentStyle),
+          return SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.person, color: Colors.black12, size: 100)
                   ],
-                ),
-              ), // Mã nhân viên
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("Tên nhân viên:", style: headerStyle),
-                    const SizedBox(width: 5),
-                    Text(snapshotNV.data[0].hoTen, style: contentStyle),
-                  ],
-                ),
-              ), //Tên nhân viên
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("Ngày sinh:", style: headerStyle),
-                    const SizedBox(width: 5),
-                    Text(snapshotNV.data[0].ngaySinh, style: contentStyle),
-                  ],
-                ),
-              ), //Ngày sinh
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("Tên nhân viên:", style: headerStyle),
-                    const SizedBox(width: 5),
-                    Text(snapshotNV.data[0].hoTen, style: contentStyle),
-                  ],
-                ),
-              ), // Giới tính
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("CCCD:", style: headerStyle),
-                    const SizedBox(width: 5),
-                    Text(snapshotNV.data[0].cccd, style: contentStyle),
-                  ],
-                ),
-              ), //CCCD
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Địa chỉ:", style: headerStyle),
-                    const SizedBox(width: 5),
-                    Flexible(child: Text(snapshotNV.data[0].diaChi, style: contentStyle)),
-                  ],
-                ),
-              ), //Địa chỉ
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("SĐT:", style: headerStyle),
-                    const SizedBox(width: 5),
-                    Text(snapshotNV.data[0].soDienThoai, style: contentStyle),
-                  ],
-                ),
-              ), // SDT
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("Email:", style: headerStyle),
-                    const SizedBox(width: 5),
-                    Text(snapshotNV.data[0].email, style: contentStyle),
-                  ],
-                ),
-              ), //Email
-            ],
+                ), // Icon
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text("Mã nhân viên:", style: headerStyle),
+                      const SizedBox(width: 5),
+                      Text(snapshotNV.data[0].maNhanVien, style: contentStyle),
+                    ],
+                  ),
+                ), // Mã nhân viên
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text("Tên nhân viên:", style: headerStyle),
+                      const SizedBox(width: 5),
+                      Text(snapshotNV.data[0].hoTen, style: contentStyle),
+                    ],
+                  ),
+                ), //Tên nhân viên
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text("Ngày sinh:", style: headerStyle),
+                      const SizedBox(width: 5),
+                      Text(snapshotNV.data[0].ngaySinh, style: contentStyle),
+                    ],
+                  ),
+                ), //Ngày sinh
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text("Tên nhân viên:", style: headerStyle),
+                      const SizedBox(width: 5),
+                      Text(snapshotNV.data[0].hoTen, style: contentStyle),
+                    ],
+                  ),
+                ), // Giới tính
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text("CCCD:", style: headerStyle),
+                      const SizedBox(width: 5),
+                      Text(snapshotNV.data[0].cccd, style: contentStyle),
+                    ],
+                  ),
+                ), //CCCD
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Địa chỉ:", style: headerStyle),
+                      const SizedBox(width: 5),
+                      Flexible(child: Text(snapshotNV.data[0].diaChi, style: contentStyle)),
+                    ],
+                  ),
+                ), //Địa chỉ
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text("SĐT:", style: headerStyle),
+                      const SizedBox(width: 5),
+                      Text(snapshotNV.data[0].soDienThoai, style: contentStyle),
+                    ],
+                  ),
+                ), // SDT
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text("Email:", style: headerStyle),
+                      const SizedBox(width: 5),
+                      Text(snapshotNV.data[0].email, style: contentStyle),
+                    ],
+                  ),
+                ), //Email
+              ],
+            ),
           );
         }
         return Text("Error while Calling API");

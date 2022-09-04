@@ -13,8 +13,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 final urlAPI = url;
 
 class InvoiceFilterList extends StatefulWidget {
-  const InvoiceFilterList({Key? key, required this.filterType}) : super(key: key);
   final int filterType;
+  const InvoiceFilterList({Key? key, required this.filterType}) : super(key: key);
 
   @override
   InvoiceFilterListState createState() => InvoiceFilterListState();
@@ -264,9 +264,7 @@ class InvoiceFilterListState extends State<InvoiceFilterList> {
       child: InkWell(
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => InvoiceInfo(
-                    idHoaDon: snapshot.data[index].idHoaDon,
-                  )));
+              builder: (context) => InvoiceInfo(idHoaDon: snapshot.data[index].idHoaDon)));
         },
         child: Card(
           shape:
@@ -275,6 +273,7 @@ class InvoiceFilterListState extends State<InvoiceFilterList> {
           elevation: 10,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Expanded(
                 flex: 5,

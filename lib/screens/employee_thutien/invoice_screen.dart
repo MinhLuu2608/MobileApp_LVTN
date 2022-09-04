@@ -86,7 +86,7 @@ class InvoiceScreenState extends State<InvoiceScreen>{
                           },
                         ), // Khách hàng
                         RadioListTile(
-                          title: Text("Tình trạng", style: TextStyle(fontSize: 20)),
+                          title: Text("Chưa thu", style: TextStyle(fontSize: 20)),
                           value: 3,
                           groupValue: _value,
                           onChanged: (value) {

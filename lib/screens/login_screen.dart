@@ -229,14 +229,14 @@ class LoginScreen extends State<LoginPage> {
                               await setIDNhanVien();
                               final snackBar = SnackBar(content: Text("Đăng nhập thành công"));
                               _scaffoldKey.currentState!.showSnackBar(snackBar);
-                              print("IDAccount : ${box1.get("IDAccount").toString()}");
-                              print("IDNhanVien: ${box1.get("IDNhanVien").toString()}");
+                              // print("IDAccount : ${box1.get("IDAccount").toString()}");
+                              // print("IDNhanVien: ${box1.get("IDNhanVien").toString()}");
                               if(box1.get("IDNhanVien") == -1){
                                 Navigator.pushReplacementNamed(context, 'customer/home');
                               }
                               else{
-                                // Navigator.pushReplacementNamed(context, 'employee_thutien/home');
-                                Navigator.pushReplacementNamed(context, 'employee_dichvu/home');
+                                Navigator.pushReplacementNamed(context, 'employee_thutien/home');
+                                // Navigator.pushReplacementNamed(context, 'employee_dichvu/home');
                               }
                             }
                             else{
