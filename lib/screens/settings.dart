@@ -71,7 +71,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             const Divider(height: 15, thickness: 2),
             const SizedBox(height: 10),
-            buildAccountOptionRow(context, "Hướng dẫn sử dụng"),
+            buildAccountOptionRow(context, "Trợ giúp từ bot"),
             buildAccountOptionRow(context, "Yêu cầu trợ giúp trực tiếp"),
             const SizedBox(height: 30),
             Center(

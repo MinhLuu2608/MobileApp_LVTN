@@ -48,12 +48,12 @@ class InvoiceScreenState extends State<InvoiceScreen>{
               builder: (context) {
                 return StatefulBuilder(builder: (context, setState) {
                   return AlertDialog(
-                    title: Center(child: Text("Lọc hoá đơn theo")),
+                    title: const Center(child: Text("Lọc hoá đơn theo")),
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         RadioListTile(
-                          title: Text("Kỳ thu", style: TextStyle(fontSize: 20)),
+                          title: const Text("Kỳ thu", style: TextStyle(fontSize: 20)),
                           value: 0,
                           groupValue: _value,
                           onChanged: (value) {
@@ -64,7 +64,7 @@ class InvoiceScreenState extends State<InvoiceScreen>{
                           },
                         ), // Kỳ thu
                         RadioListTile(
-                          title: Text("Tuyến thu", style: TextStyle(fontSize: 20)),
+                          title: const Text("Tuyến thu", style: TextStyle(fontSize: 20)),
                           value: 1,
                           groupValue: _value,
                           onChanged: (value) {
@@ -75,7 +75,7 @@ class InvoiceScreenState extends State<InvoiceScreen>{
                           },
                         ), // Tuyến thu
                         RadioListTile(
-                          title: Text("Khách hàng", style: TextStyle(fontSize: 20)),
+                          title: const Text("Khách hàng", style: TextStyle(fontSize: 20)),
                           value: 2,
                           groupValue: _value,
                           onChanged: (value) {
@@ -86,7 +86,7 @@ class InvoiceScreenState extends State<InvoiceScreen>{
                           },
                         ), // Khách hàng
                         RadioListTile(
-                          title: Text("Chưa thu", style: TextStyle(fontSize: 20)),
+                          title: const Text("Chưa thu", style: TextStyle(fontSize: 20)),
                           value: 3,
                           groupValue: _value,
                           onChanged: (value) {
@@ -107,12 +107,12 @@ class InvoiceScreenState extends State<InvoiceScreen>{
                               updateState = !updateState;
                             });
                           },
-                          child: Text("Lọc", style: TextStyle(fontSize: 20))),
+                          child: const Text("Lọc", style: TextStyle(fontSize: 20))),
                       TextButton(
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
-                          child: Text("Huỷ bỏ", style: TextStyle(fontSize: 20)))
+                          child: const Text("Huỷ bỏ", style: TextStyle(fontSize: 20)))
                     ],
                   );
                 });

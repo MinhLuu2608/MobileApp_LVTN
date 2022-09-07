@@ -24,8 +24,7 @@ class InvoiceListState extends State<InvoiceList> {
   InvoiceListState();
 
   static const TextStyle optionMainStyle = TextStyle(fontSize: 16);
-  static const TextStyle optionSubStyle =
-  TextStyle(fontSize: 14, fontWeight: FontWeight.bold);
+  static const TextStyle optionSubStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.bold);
 
   static const TextStyle styleContent = TextStyle(fontSize: 20);
 
@@ -74,10 +73,10 @@ class InvoiceListState extends State<InvoiceList> {
         future: getHoaDon(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Text("Something Wrong");
+            return const Text("Something Wrong");
           }
           if (snapshot.hasData) {
             return RefreshIndicator(
@@ -92,7 +91,7 @@ class InvoiceListState extends State<InvoiceList> {
               ),
             );
           }
-          return Text("Error while Calling API");
+          return const Text("Error while Calling API");
         },
       ),
     );
@@ -150,14 +149,8 @@ class InvoiceListState extends State<InvoiceList> {
                     Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: snapshot.data[index].ngayThu == "Chưa thu"
-                          ? Text(
-                        "Chưa thu",
-                        style:
-                        TextStyle(color: Colors.pink, fontSize: 20),
-                      )
-                          : Text("Đã thu",
-                          style: TextStyle(
-                              color: Colors.lightGreen, fontSize: 20)),
+                          ? const Text( "Chưa thu", style: TextStyle(color: Colors.pink, fontSize: 20))
+                          : const Text("Đã thu", style: TextStyle(color: Colors.lightGreen, fontSize: 20)),
                     ),
                   ],
                 ),

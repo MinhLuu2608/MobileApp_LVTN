@@ -1,7 +1,6 @@
 import 'package:MobileApp_LVTN/constants.dart';
 import 'package:MobileApp_LVTN/models/donhang.dart';
-import 'package:MobileApp_LVTN/models/dichvu.dart';
-import 'package:MobileApp_LVTN/models/emp_invoice.dart';
+import 'package:MobileApp_LVTN/models/chitiet_dichvu.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -42,7 +41,7 @@ class OrderInfoState extends State<OrderInfo>{
     return response;
   }
 
-  Future<List<DichVu>> getDichVuList() async {
+  Future<List<ChiTietDichVu>> getDichVuList() async {
     final url = Uri.http(urlAPI, 'api/MobileApp/getEmpOrdersServiceInfo/${widget.idDonHang}');
     final resp = await http.get(url, headers: {
       // "Access-Control-Allow-Origin": "*",

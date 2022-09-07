@@ -1,3 +1,4 @@
+import 'package:MobileApp_LVTN/screens/customer/services_screen.dart';
 import 'package:MobileApp_LVTN/screens/settings.dart';
 
 import 'invoices_screen.dart';
@@ -18,12 +19,14 @@ class _HomeScreenState extends State<HomeScreen>{
   List<Widget> title = [
     Text('Trang chủ', style: optionStyle),
     Text('Hoá đơn', style: optionStyle),
+    Text('Dịch vụ', style: optionStyle),
     Text('Cài đặt', style: optionStyle),
   ];
 
   List<Widget> screens = [
     Text('Home', style: optionStyle),
     InvoicesScreen(),
+    ServicesScreen(),
     SettingsPage(),
   ];
 
@@ -47,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen>{
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Trang chủ"),
           BottomNavigationBarItem(icon: Icon(Icons.receipt), label: "Hoá đơn"),
+          BottomNavigationBarItem(icon: Icon(Icons.cleaning_services_sharp), label: "Dịch vụ"),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Cài đặt"),
         ],
         currentIndex: _selectedIndex,
