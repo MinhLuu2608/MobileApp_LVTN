@@ -201,7 +201,7 @@ class LoginScreen extends State<LoginPage> {
                               });
                             },
                           ),
-                          Text("Nhớ mật khẩu",style: TextStyle(color: Colors.black, fontSize: 20),)
+                          const Text("Nhớ mật khẩu",style: TextStyle(color: Colors.black, fontSize: 20),)
                         ],
                       ),
                       const SizedBox(height: 30),
@@ -213,13 +213,14 @@ class LoginScreen extends State<LoginPage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 80, vertical: 15),
-                          child: const Text('Đăng nhập',
-                              style: TextStyle(color: Colors.white, fontSize: 20)),
+                          child: const Text('Đăng nhập', style: TextStyle(color: Colors.white, fontSize: 20)),
                         ),
                         onPressed: () async{
                           // var userAccount = userAccountProvider.userAccount;
                           if(!formKey.currentState!.validate()){
-                            final snackBar = SnackBar(content: Text("Username hoặc password không hợp lệ"));
+                            const snackBar = SnackBar(content:
+                              Text("Username hoặc password không hợp lệ", style: TextStyle(fontSize: 20))
+                            );
                             _scaffoldKey.currentState!.showSnackBar(snackBar);
                           }
                           else{
@@ -227,7 +228,7 @@ class LoginScreen extends State<LoginPage> {
                               rememberPassword(txtUsername.text, txtPassword.text);
                               await setIDAccount(txtUsername.text, txtPassword.text);
                               await setIDNhanVien();
-                              final snackBar = SnackBar(content: Text("Đăng nhập thành công"));
+                              const snackBar = SnackBar(content: Text("Đăng nhập thành công", style: TextStyle(fontSize: 20)));
                               _scaffoldKey.currentState!.showSnackBar(snackBar);
                               // print("IDAccount : ${box1.get("IDAccount").toString()}");
                               // print("IDNhanVien: ${box1.get("IDNhanVien").toString()}");
@@ -235,12 +236,12 @@ class LoginScreen extends State<LoginPage> {
                                 Navigator.pushReplacementNamed(context, 'customer/home');
                               }
                               else{
-                                Navigator.pushReplacementNamed(context, 'employee_thutien/home');
-                                // Navigator.pushReplacementNamed(context, 'employee_dichvu/home');
+                                // Navigator.pushReplacementNamed(context, 'employee_thutien/home');
+                                Navigator.pushReplacementNamed(context, 'employee_dichvu/home');
                               }
                             }
                             else{
-                              final snackBar = SnackBar(content: Text("Đăng nhập thất bại"));
+                              const snackBar = SnackBar(content: Text("Đăng nhập thất bại", style: TextStyle(fontSize: 20)));
                               _scaffoldKey.currentState!.showSnackBar(snackBar);
                             }
                           }

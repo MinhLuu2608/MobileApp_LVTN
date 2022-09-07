@@ -1,6 +1,6 @@
 import 'package:MobileApp_LVTN/screens/employee_thutien/emp_info.dart';
+import 'package:MobileApp_LVTN/screens/settings.dart';
 import 'order_screen.dart';
-import 'package:MobileApp_LVTN/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 
 class EmpDichVuHomeScreen extends StatefulWidget{
@@ -23,7 +23,7 @@ class _EmpHomeScreenState extends State<EmpDichVuHomeScreen>{
   List<Widget> screens = [
     EmpInfo(),
     OrderScreen(),
-    SettingsScreen(),
+    SettingsPage(),
   ];
 
   void _onItemTapped(int index){

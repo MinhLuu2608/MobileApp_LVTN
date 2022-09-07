@@ -134,8 +134,7 @@ class InvoiceFilterListState extends State<InvoiceFilterList> {
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.all(5.0),
-                    child: Text(snapshot.data[index].maKhachHang,
-                        style: styleContent),
+                    child: Text(snapshot.data[index].maKhachHang, style: styleContent),
                   ), // Mã khách hàng
                   Padding(
                     padding: const EdgeInsets.all(5.0),
@@ -144,13 +143,11 @@ class InvoiceFilterListState extends State<InvoiceFilterList> {
                   ), // Tên khách hàng
                   Padding(
                     padding: const EdgeInsets.all(5.0),
-                    child: Text("Địa chỉ: ${snapshot.data[index].diaChi}",
-                        style: styleContent),
+                    child: Text("Địa chỉ: ${snapshot.data[index].diaChi}", style: styleContent),
                   ), //Địa chỉ
                   Padding(
                       padding: const EdgeInsets.all(5.0),
-                      child: Text("CCCD: ${snapshot.data[index].cccd}",
-                          style: styleContent)), //CCCD
+                      child: Text("CCCD: ${snapshot.data[index].cccd}", style: styleContent)), //CCCD
                 ],
               ),
             ],

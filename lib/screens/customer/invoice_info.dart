@@ -23,9 +23,9 @@ class InvoiceInfoState extends State<InvoiceInfo>{
 
   var updateState = false;
 
-  static const TextStyle headerStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
-  static const TextStyle contentStyle = TextStyle(fontSize: 20,);
-  static const TextStyle chuaThuStyle = TextStyle(fontSize: 20, color: Colors.pink);
+  static const TextStyle headerStyle = TextStyle(fontSize: 18, fontWeight: FontWeight.bold);
+  static const TextStyle contentStyle = TextStyle(fontSize: 18,);
+  static const TextStyle chuaThuStyle = TextStyle(fontSize: 18, color: Colors.pink);
 
   Map<String, dynamic>? paymentIntent;
 
@@ -200,7 +200,7 @@ class InvoiceInfoState extends State<InvoiceInfo>{
                                         children: const [
                                           Icon(Icons.warning_amber, color: Colors.amber,),
                                           Flexible(
-                                            child: Text("Hoá đơn trước chưa thanh toán", style: TextStyle(fontSize: 18),),
+                                            child: Text("Hoá đơn trước chưa thanh toán", style: TextStyle(fontSize: 18)),
                                           ),
                                         ],
                                       ),
@@ -243,10 +243,11 @@ class InvoiceInfoState extends State<InvoiceInfo>{
                         padding: const EdgeInsets.all(10),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text("Hình thức thanh toán:", style: headerStyle),
                             const SizedBox(width: 5),
-                            Text(snapshot.data, style: contentStyle),
+                            Flexible(child: Text(snapshot.data, style: contentStyle)),
                           ],
                         ),
                       );

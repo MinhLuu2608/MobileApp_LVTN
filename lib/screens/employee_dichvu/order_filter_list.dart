@@ -1,11 +1,6 @@
 import 'package:MobileApp_LVTN/constants.dart';
 import 'package:MobileApp_LVTN/models/donhang.dart';
-import 'package:MobileApp_LVTN/models/emp_invoice.dart';
-import 'package:MobileApp_LVTN/models/khachhang.dart';
-import 'package:MobileApp_LVTN/models/kythu.dart';
-import 'package:MobileApp_LVTN/models/tuyenthu_alter.dart';
-import 'package:MobileApp_LVTN/screens/employee_thutien//invoice_info.dart';
-import 'package:MobileApp_LVTN/screens/employee_thutien/invoice_list.dart';
+import 'package:MobileApp_LVTN/screens/employee_dichvu/order_info.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
@@ -105,8 +100,8 @@ class OrderFilterListState extends State<OrderFilterList> {
       child: InkWell(
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => InvoiceInfo(
-                    idHoaDon: snapshot.data[index].idDonHang,
+              builder: (context) => OrderInfo(
+                  idDonHang: snapshot.data[index].idDonHang,
                   )));
         },
         child: Card(

@@ -1,4 +1,6 @@
 import 'package:MobileApp_LVTN/constants.dart';
+import 'package:MobileApp_LVTN/models/donhang.dart';
+import 'package:MobileApp_LVTN/models/dichvu.dart';
 import 'package:MobileApp_LVTN/models/emp_invoice.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -20,22 +22,35 @@ class OrderInfoState extends State<OrderInfo>{
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  var dichVuList;
   var updateState = false;
 
   static const TextStyle headerStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
   static const TextStyle contentStyle = TextStyle(fontSize: 20,);
   static const TextStyle chuaThuStyle = TextStyle(fontSize: 20, color: Colors.pink);
 
-  Future<List<EmpInvoice>> getHoaDonInfo() async {
-    final url = Uri.http(urlAPI, 'api/MobileApp/empHoaDonInfo/$widget.idDonHang');
-
+  Future<List<DonHang>> getDonHangInfo() async {
+    final url = Uri.http(urlAPI, 'api/MobileApp/getEmpOrdersInfo/${widget.idDonHang}');
     final resp = await http.get(url, headers: {
       // "Access-Control-Allow-Origin": "*",
       // "Access-Control-Allow-Credentials": "true",
       "Content-type": "application/json",
       // "Accept": "application/json"
     });
-    final response = empInvoiceFromJson(resp.body);
+    final response = donHangFromJson(resp.body);
+    dichVuList = await getDichVuList();
+    return response;
+  }
+
+  Future<List<DichVu>> getDichVuList() async {
+    final url = Uri.http(urlAPI, 'api/MobileApp/getEmpOrdersServiceInfo/${widget.idDonHang}');
+    final resp = await http.get(url, headers: {
+      // "Access-Control-Allow-Origin": "*",
+      // "Access-Control-Allow-Credentials": "true",
+      "Content-type": "application/json",
+      // "Accept": "application/json"
+    });
+    final response = dichVuFromJson(resp.body);
     return response;
   }
 
@@ -54,7 +69,7 @@ class OrderInfoState extends State<OrderInfo>{
         title: const Padding(padding: EdgeInsets.only(left: 50), child: Text('Chi tiết hoá đơn')),
       ),
       body: FutureBuilder(
-        future: getHoaDonInfo(),
+        future: getDonHangInfo(),
         builder: (BuildContext context, AsyncSnapshot snapshot){
           if(snapshot.connectionState != ConnectionState.done){
             return Center(child: CircularProgressIndicator());
@@ -63,228 +78,159 @@ class OrderInfoState extends State<OrderInfo>{
             return Text("Something Wrong");
           }
           if(snapshot.hasData){
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Center(
-                      child: Text("Hoá đơn tháng ${snapshot.data[0].thang}",
-                          style: const TextStyle( fontSize: 30, fontWeight: FontWeight.bold))),
-                ), // Title hoá đơn
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Mã số phiếu:",
-                        style: headerStyle,
-                      ),
-                      const SizedBox(width: 5),
-                      Text(snapshot.data[0].maSoPhieu, style: contentStyle),
-                    ],
-                  ),
-                ), // Mã số phiếu
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Text("Mã khách hàng:", style: headerStyle),
-                      const SizedBox(width: 5),
-                      Text(snapshot.data[0].maKhachHang, style: contentStyle),
-                    ],
-                  ),
-                ), // Mã khách hàng
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Text("Tên khách hàng:", style: headerStyle),
-                      const SizedBox(width: 5),
-                      Text(snapshot.data[0].hoTenKH, style: contentStyle),
-                    ],
-                  ),
-                ), // Tên khách hàng
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Text("Loại khách hàng:", style: headerStyle),
-                      const SizedBox(width: 5),
-                      Text(snapshot.data[0].tenLoai, style: contentStyle),
-                    ],
-                  ),
-                ), // Loại khách hàng
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text("Địa chỉ:", style: headerStyle),
-                      const SizedBox(width: 5),
-                      Flexible(
-                          child: Text(snapshot.data[0].diaChiKH,
-                              style: contentStyle)),
-                    ],
-                  ),
-                ), // Địa chỉ khách hàng
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Text("Ngày tạo hoá đơn:", style: headerStyle),
-                      const SizedBox(width: 5),
-                      Text(snapshot.data[0].ngayTao, style: contentStyle),
-                    ],
-                  ),
-                ), // Ngày tạo
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text("Ngày thu:", style: headerStyle),
-                      const SizedBox(width: 5),
-                      snapshot.data[0].ngayThu == "Chưa thu"
-                          ? Text(snapshot.data[0].ngayThu,
-                              style: chuaThuStyle)
-                          : Text(snapshot.data[0].ngayThu,
-                              style: contentStyle)
-                    ],
-                  ),
-                ), // Ngày thu
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text("Giá:", style: headerStyle),
-                      const SizedBox(width: 5),
-                      Text(snapshot.data[0].gia.toString() + "đ",
-                          style: contentStyle),
-                    ],
-                  ),
-                ), // Giá
-                snapshot.data[0].ngayThu == "Chưa thu"
-                    ? Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                  backgroundColor: Colors.greenAccent,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 20),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  )),
-                              onPressed: () async {
-                                if (await checkAbleToPay(
-                                    snapshot.data[0].idHoaDon)) {
-                                  var response = await handleConfirm(
-                                      idHoaDon: snapshot.data[0].idHoaDon,
-                                      idNhanVien: snapshot.data[0].idNhanVien,
-                                      idTuyenThu: snapshot.data[0].idTuyenThu
-                                  );
-                                  showDialog(
-                                      context: context,
-                                      builder: (_) => buildAlertDialogSuccess(response));
-                                  setState(() {
-                                    updateState = !updateState;
-                                  });
-                                }
-                                else {
-                                  showDialog(
-                                      context: context,
-                                      builder: (_) => buildAlertDialogWarning());
-                                }
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Text("Xác nhận thu tiền", style: TextStyle(fontSize: 22, letterSpacing: 2.2, color: Colors.blue)),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 20)
-                          ],
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: Center(
+                        child: Text("Đơn hàng ${snapshot.data[0].maDonHang}",
+                            style: const TextStyle( fontSize: 30, fontWeight: FontWeight.bold))),
+                  ), // Title đơn hàng
+                  Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Tên khách hàng",
+                          style: headerStyle,
                         ),
-                      )
-                    : FutureBuilder(
-                        future:
-                            getHinhThucThanhToan(snapshot.data[0].idHoaDon),
-                        builder:
-                            (BuildContext context, AsyncSnapshot snapshot) {
-                          if (snapshot.connectionState != ConnectionState.done) {
-                            return Center(child: CircularProgressIndicator());
-                          }
-                          if (snapshot.hasError) {
-                            return Text("Something Wrong");
-                          }
-                          if (snapshot.hasData) {
-                            return Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(10),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                        const Text("Hình thức thanh toán:", style: headerStyle),
-                                        const SizedBox(width: 5),
-                                        Text(snapshot.data, style: contentStyle),
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        OutlinedButton(
-                                          style: OutlinedButton.styleFrom(
-                                              backgroundColor: Colors.greenAccent,
-                                              padding: const EdgeInsets.symmetric(
-                                                  horizontal: 20, vertical: 20),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(20),
-                                              )),
-                                          onPressed: () async {
-
-                                          },
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: const [
-                                              Text("In hoá đơn", style: TextStyle(fontSize: 22, letterSpacing: 2.2, color: Colors.blue)),
-                                            ],
-                                          ),
-                                        ),
-                                        const SizedBox(height: 20)
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            );
-                          }
-                          return Text("Error while Calling API");
-                        },
-                      )
-              ],
+                        const SizedBox(width: 5),
+                        Text(snapshot.data[0].tenKhachHang, style: contentStyle),
+                      ],
+                    ),
+                  ), // Tên khách hàng
+                  Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("Địa chỉ:", style: headerStyle),
+                        const SizedBox(width: 5),
+                        Flexible(child: Text(snapshot.data[0].diaChiKh,style: contentStyle)),
+                      ],
+                    ),
+                  ), // Địa chỉ khách hàng
+                  Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Text("Số điện thoại:", style: headerStyle),
+                        const SizedBox(width: 5),
+                        Text(snapshot.data[0].soDienThoaiKh, style: contentStyle),
+                      ],
+                    ),
+                  ), // Số điện thoại KH
+                  Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: (buildTextTinhTrangXuLy(snapshot))
+                  ), // Tình trạng xử lý
+                  Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text("Ngày thu:", style: headerStyle),
+                        const SizedBox(width: 5),
+                        snapshot.data[0].ngayThu == "Chưa thu"
+                            ? Text(snapshot.data[0].ngayThu,
+                                style: chuaThuStyle)
+                            : Text(snapshot.data[0].ngayThu,
+                                style: contentStyle)
+                      ],
+                    ),
+                  ), // Ngày thu
+                  Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: Text("Danh sách dịch vụ", style: headerStyle)
+                  ), //Danh sách dịch vụ header
+                  Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: buildTableDichVu()
+                  ), //Dịch vụ list
+                ],
+              ),
             );
           }
           return Text("Error while Calling API");
         },
       ),
     );
+  }
+
+  Table buildTableDichVu() {
+    return Table(
+      border: TableBorder.all(),
+      columnWidths: const <int, TableColumnWidth>{
+        0: FractionColumnWidth(0.3),
+        1: FractionColumnWidth(0.1),
+        2: FractionColumnWidth(0.2),
+        3: FractionColumnWidth(0.2),
+        4: FractionColumnWidth(0.2)
+      },
+      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+      children: <TableRow>[
+        TableRow(
+          children: <Widget>[
+            Text("Tên dịch vụ", style: headerStyle),
+            Text("ĐVT", style: headerStyle),
+            Text("Đơn giá", style: headerStyle),
+            Text("SL", style: headerStyle),
+            Text("Tổng", style: headerStyle),
+          ],
+        )
+      ]
+    );
+  }
+
+  buildTextTinhTrangXuLy(AsyncSnapshot<dynamic> snapshot) {
+    if(snapshot.data[0].tinhTrangXuLy == "Chờ xử lý") {
+      return Row(
+        children: [
+          Text("Tình trạng xử lý: ", style: const TextStyle(fontSize: 20,)),
+          Text(snapshot.data[0].tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.pinkAccent)),
+        ],
+      );
+    }
+    if(snapshot.data[0].tinhTrangXuLy == "Đã tiếp nhận"){
+      return Row(
+        children: [
+          Text("Tình trạng xử lý: ", style: headerStyle),
+          Text(snapshot.data[0].tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.blue)),
+        ],
+      );
+    }
+    if(snapshot.data[0].tinhTrangXuLy == "Đã hoàn thành"){
+      return Row(
+        children: [
+          Text("Tình trạng xử lý: ", style: headerStyle),
+          Text(snapshot.data[0].tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.green)),
+        ],
+      );
+    }
+    if(snapshot.data[0].tinhTrangXuLy == "Đã bị huỷ"){
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text("Tình trạng xử lý: ", style: headerStyle),
+              Text("${snapshot.data[0].tinhTrangXuLy} ", style: const TextStyle(fontSize: 20, color: Colors.grey)),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Text("Lý do: ${snapshot.data[0].note}", style: const TextStyle(fontSize: 20)),
+          )
+        ],
+      );
+    }
+    return Text(snapshot.data[0].tinhTrangXuLy);
   }
 
   AlertDialog buildAlertDialogWarning() {

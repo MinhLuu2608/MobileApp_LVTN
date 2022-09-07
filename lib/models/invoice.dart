@@ -39,7 +39,7 @@ class Invoice {
 
   factory Invoice.fromJson(Map<String, dynamic> json) => Invoice(
     idHoaDon: json["IDHoaDon"],
-    maSoPhieu: json["MaSoPhieu"],
+    maSoPhieu: json["MaSoHoaDon"],
     ngayTao: json["NgayTao"],
     ngayThu: json["NgayThu"] == null ? "Chưa thu" : json["NgayThu"],
     tenKyThu: json["TenKyThu"],
@@ -54,7 +54,7 @@ class Invoice {
 
   Map<String, dynamic> toJson() => {
     "IDHoaDon": idHoaDon,
-    "MaSoPhieu": maSoPhieu,
+    "MaSoHoaDon": maSoPhieu,
     "NgayTao" : ngayTao,
     "NgayThu": ngayThu == null ? null : ngayThu,
     "TenKyThu": tenKyThu,

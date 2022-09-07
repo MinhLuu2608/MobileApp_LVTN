@@ -1,3 +1,5 @@
+import 'package:MobileApp_LVTN/screens/settings.dart';
+
 import 'invoices_screen.dart';
 import 'package:MobileApp_LVTN/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen>{
   List<Widget> screens = [
     Text('Home', style: optionStyle),
     InvoicesScreen(),
-    SettingsScreen(),
+    SettingsPage(),
   ];
 
   void _onItemTapped(int index){

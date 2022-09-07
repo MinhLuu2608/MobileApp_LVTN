@@ -59,7 +59,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 )
               ),
               onPressed: (){
-
                 Navigator.pushReplacementNamed(context, 'login');
               },
               child: Row(
