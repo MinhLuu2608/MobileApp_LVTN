@@ -1,3 +1,4 @@
+import 'package:MobileApp_LVTN/screens/customer/order_list.dart';
 import 'package:MobileApp_LVTN/screens/customer/service_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,7 @@ class ServicesScreenState extends State<ServicesScreen> {
               Expanded(child: TabBarView(
                 children: [
                   ServiceListScreen(),
-                  Text('Person')
+                  OrderListScreen()
                 ],
               ))
             ],

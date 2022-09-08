@@ -22,6 +22,9 @@ class DonHang {
     required this.tinhTrangXuLy,
     required this.note,
     required this.tongTienDh,
+    this.maNhanVien,
+    this.hoTen,
+    this.soDienThoai,
   });
 
   int idDonHang;
@@ -30,12 +33,15 @@ class DonHang {
   String diaChiKh;
   String soDienThoaiKh;
   String ngayTao;
-  String ngayHen;
+  dynamic ngayHen;
   String buoiHen;
-  String ngayThu;
+  dynamic ngayThu;
   String tinhTrangXuLy;
   String note;
   int tongTienDh;
+  dynamic maNhanVien;
+  dynamic hoTen;
+  dynamic soDienThoai;
 
   factory DonHang.fromJson(Map<String, dynamic> json) => DonHang(
     idDonHang: json["IDDonHang"],
@@ -50,6 +56,9 @@ class DonHang {
     tinhTrangXuLy: json["TinhTrangXuLy"],
     note: json["Note"],
     tongTienDh: json["TongTienDH"],
+    maNhanVien: json["MaNhanVien"],
+    hoTen: json["HoTen"],
+    soDienThoai: json["SoDienThoai"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -58,6 +67,7 @@ class DonHang {
     "TenKhachHang": tenKhachHang,
     "DiaChiKH": diaChiKh,
     "SoDienThoaiKH": soDienThoaiKh,
+
     "NgayTao": ngayTao,
     "NgayHen": ngayHen,
     "BuoiHen": buoiHen,
@@ -65,5 +75,8 @@ class DonHang {
     "TinhTrangXuLy": tinhTrangXuLy,
     "Note": note,
     "TongTienDH": tongTienDh,
+    "MaNhanVien": maNhanVien,
+    "HoTen": hoTen,
+    "SoDienThoai": soDienThoai,
   };
 }

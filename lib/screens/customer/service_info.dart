@@ -2,7 +2,6 @@ import 'package:MobileApp_LVTN/constants.dart';
 import 'package:MobileApp_LVTN/models/account.dart';
 import 'package:MobileApp_LVTN/models/dichvu.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
@@ -69,7 +68,7 @@ class ServiceInfoState extends State<ServiceInfo> {
           buildImage(),
           const SizedBox(height: 10),
           Padding(
-            padding: const EdgeInsets.all(5),
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
             child: Row(
               children: [
                 const Text("Tên dịch vụ", style: optionMainStyle),
@@ -77,9 +76,71 @@ class ServiceInfoState extends State<ServiceInfo> {
                 Text(dichVuInfo.tenDichVu, style: styleContent)
               ],
             ),
-          ) // Tên dịch vụ
+          ), // Tên dịch vụ
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+            child: Row(
+              children: [
+                const Text("Loại dịch vụ", style: optionMainStyle),
+                const  SizedBox(width: 10),
+                Text(dichVuInfo.loaiDichVu, style: styleContent)
+              ],
+            ),
+          ), // Loại dịch vụ
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+            child: Row(
+              children: [
+                const Text("Đơn giá: ", style: optionMainStyle),
+                const  SizedBox(width: 10),
+                Text("${dichVuInfo.donGiaDv}/${dichVuInfo.donViTinh}", style: styleContent)
+              ],
+            ),
+          ), // Loại dịch vụ
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+            child:  Text("Mô tả dịch vụ:", style: optionMainStyle)
+          ), // Mô tả dịch vụ header
+          Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
+              child:  Text(dichVuInfo.moTaDichVu, style: styleContent)
+          ), // Mô tả dịch vụ nội dung
+          Expanded(child: buildButtonRequest())
         ],
       )
+    );
+  }
+
+  Column buildButtonRequest() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: OutlinedButton(
+            style: OutlinedButton.styleFrom(
+                backgroundColor: Colors.greenAccent,
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
+            ),
+            onPressed: () {
+              // Navigator.of(context).push(MaterialPageRoute(
+              //     builder: (context) => ServiceInfo(
+              //         dichVuInfo: snapshot.data[index])));
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: const [
+                Icon(Icons.shopping_cart),
+                SizedBox(width: 10),
+                Text("Yêu cầu dịch vụ", style: TextStyle(fontSize: 22, letterSpacing: 2.2, color: Colors.blue)),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 

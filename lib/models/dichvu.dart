@@ -14,6 +14,7 @@ class DichVu {
     required this.maDichVu,
     required this.loaiDichVu,
     required this.tenDichVu,
+    required this.moTaDichVu,
     required this.donViTinh,
     required this.donGiaDv,
     required this.tinhTrangDv,
@@ -23,6 +24,7 @@ class DichVu {
   String maDichVu;
   String loaiDichVu;
   String tenDichVu;
+  String moTaDichVu;
   String donViTinh;
   int donGiaDv;
   int tinhTrangDv;
@@ -32,6 +34,7 @@ class DichVu {
     maDichVu: json["MaDichVu"],
     loaiDichVu: json["LoaiDichVu"],
     tenDichVu: json["TenDichVu"],
+    moTaDichVu: json["MoTaDV"] == '' ? "Không có mô tả cho dịch vụ này" : json["MoTaDV"],
     donViTinh: json["DonViTinh"],
     donGiaDv: json["DonGiaDV"],
     tinhTrangDv: json["TinhTrangDV"],
@@ -42,6 +45,7 @@ class DichVu {
     "MaDichVu": maDichVu,
     "LoaiDichVu": loaiDichVu,
     "TenDichVu": tenDichVu,
+    "MoTaDV": moTaDichVu,
     "DonViTinh": donViTinh,
     "DonGiaDV": donGiaDv,
     "TinhTrangDV": tinhTrangDv,
