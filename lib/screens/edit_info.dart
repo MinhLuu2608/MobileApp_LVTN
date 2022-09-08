@@ -127,7 +127,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         boxShadow: [
                           BoxShadow(spreadRadius: 2, blurRadius: 10, color: Colors.black.withOpacity(0.1), offset: Offset(0, 10))
                         ],
-                        shape: BoxShape.circle
+                        shape: BoxShape.circle,
+                      image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: NetworkImage('https://png.pngtree.com/png-clipart/20210608/ourlarge/pngtree-dark-gray-simple-avatar-png-image_3418404.jpg')
+                      )
                     ),
                   ),
                   Positioned(
