@@ -8,8 +8,10 @@ import 'package:http/http.dart' as http;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
 
-final urlAPI = url;
+const urlAPI = url;
 class OrderListScreen extends StatefulWidget {
+  const OrderListScreen({Key? key}) : super(key: key);
+
   @override
   OrderListScreenState createState() => OrderListScreenState();
 }

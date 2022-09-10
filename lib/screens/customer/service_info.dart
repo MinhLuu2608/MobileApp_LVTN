@@ -1,6 +1,7 @@
 import 'package:MobileApp_LVTN/constants.dart';
 import 'package:MobileApp_LVTN/models/account.dart';
 import 'package:MobileApp_LVTN/models/dichvu.dart';
+import 'package:MobileApp_LVTN/screens/customer/service_request.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
@@ -124,9 +125,8 @@ class ServiceInfoState extends State<ServiceInfo> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
             ),
             onPressed: () {
-              // Navigator.of(context).push(MaterialPageRoute(
-              //     builder: (context) => ServiceInfo(
-              //         dichVuInfo: snapshot.data[index])));
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => ServiceRequest(dichVu: widget.dichVuInfo)));
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

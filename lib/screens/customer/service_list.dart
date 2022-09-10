@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:MobileApp_LVTN/constants.dart';
 import 'package:MobileApp_LVTN/models/dichvu.dart';
 import 'package:MobileApp_LVTN/screens/customer/service_info.dart';
@@ -23,15 +22,32 @@ class ServiceListScreenState extends State<ServiceListScreen> {
   final _txtSearch = TextEditingController();
 
   Future<List<DichVu>> getServices() async {
-    final url = Uri.http(urlAPI, 'api/DichVu/$radioValue/1');
-    final resp = await http.get(url, headers: {
-      // "Access-Control-Allow-Origin": "*",
-      // "Access-Control-Allow-Credentials": "true",
-      "Content-type": "application/json",
-      // "Accept": "application/json"
-    });
-    final response = dichVuFromJson(resp.body);
-    return response;
+    if(_txtSearch.text.isEmpty){
+      final url = Uri.http(urlAPI, 'api/DichVu/$radioValue/1');
+      final resp = await http.get(url, headers: {
+        // "Access-Control-Allow-Origin": "*",
+        // "Access-Control-Allow-Credentials": "true",
+        "Content-type": "application/json",
+        // "Accept": "application/json"
+      });
+      final response = dichVuFromJson(resp.body);
+      return response;
+    }
+    else{
+      final url = Uri.http(urlAPI, 'api/DichVu/searchDV');
+      var jsonBody = {
+        'TenDichVu': _txtSearch.text
+      };
+      String jsonStr = json.encode(jsonBody);
+      final resp = await http.post(url, body: jsonStr, headers: {
+        // "Access-Control-Allow-Origin": "*",
+        // "Access-Control-Allow-Credentials": "true",
+        "Content-type": "application/json",
+        // "Accept": "application/json"
+      });
+      final response = dichVuFromJson(resp.body);
+      return response;
+    }
   }
 
   showImage(String image){
