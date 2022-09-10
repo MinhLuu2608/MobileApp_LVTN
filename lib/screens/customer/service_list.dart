@@ -130,78 +130,79 @@ class ServiceListScreenState extends State<ServiceListScreen> {
 
   FloatingActionButton buildFilter(BuildContext context) {
     return FloatingActionButton(
-          tooltip: "Lọc",
-          child: Icon(Icons.filter_alt_rounded),
-          onPressed: ()  {
-            int _value = radioValue;
-            showDialog(
-              context: context,
-              builder: (context) {
-                return StatefulBuilder(builder: (context, setState) {
-                  return AlertDialog(
-                    title:
-                    const Center(child: Text("Lọc loại dịch vụ theo:")),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Kỳ thu
-                        RadioListTile(
-                          title: const Text("Trong nhà", style: TextStyle(fontSize: 20)),
-                          value: 1,
-                          groupValue: _value,
-                          onChanged: (value) {
-                            setState(() {
-                              _value = int.parse(value.toString());
-                              // print(radioValue);
-                            });
-                          },
-                        ), // Trong nhà
-                        RadioListTile(
-                          title: const Text("Ngoài trời", style: TextStyle(fontSize: 20)),
-                          value: 2,
-                          groupValue: _value,
-                          onChanged: (value) {
-                            setState(() {
-                              _value = int.parse(value.toString());
-                              // print(radioValue);
-                            });
-                          },
-                        ), // Ngoài trời
-                        RadioListTile(
-                          title: const Text("Tất cả", style: TextStyle(fontSize: 20)),
-                          value: -1,
-                          groupValue: _value,
-                          onChanged: (value) {
-                            setState(() {
-                              _value = int.parse(value.toString());
-                              // print(radioValue);
-                            });
-                          },
-                        ), // Tất cả
-                      ],
-                    ),
-                    actions: [
-                      TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            radioValue = _value;
-                            this.setState(() {
-                              updateState = !updateState;
-                            });
-                          },
-                          child: const Text("Lọc", style: TextStyle(fontSize: 20))),
-                      TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text("Huỷ bỏ", style: TextStyle(fontSize: 20)))
+      tooltip: "Lọc",
+      child: Icon(Icons.filter_alt_rounded),
+      onPressed: () {
+        int _value = radioValue;
+        showDialog(
+            context: context,
+            builder: (context) {
+              return StatefulBuilder(builder: (context, setState) {
+                return AlertDialog(
+                  title: const Center(child: Text("Lọc loại dịch vụ theo:")),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Kỳ thu
+                      RadioListTile(
+                        title: const Text("Trong nhà",
+                            style: TextStyle(fontSize: 20)),
+                        value: 1,
+                        groupValue: _value,
+                        onChanged: (value) {
+                          setState(() {
+                            _value = int.parse(value.toString());
+                            // print(radioValue);
+                          });
+                        },
+                      ), // Trong nhà
+                      RadioListTile(
+                        title: const Text("Ngoài trời",
+                            style: TextStyle(fontSize: 20)),
+                        value: 2,
+                        groupValue: _value,
+                        onChanged: (value) {
+                          setState(() {
+                            _value = int.parse(value.toString());
+                            // print(radioValue);
+                          });
+                        },
+                      ), // Ngoài trời
+                      RadioListTile(
+                        title: const Text("Tất cả",
+                            style: TextStyle(fontSize: 20)),
+                        value: -1,
+                        groupValue: _value,
+                        onChanged: (value) {
+                          setState(() {
+                            _value = int.parse(value.toString());
+                            // print(radioValue);
+                          });
+                        },
+                      ), // Tất cả
                     ],
-                  );
-                });
-              }
-            );
-          },
-        );
+                  ),
+                  actions: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          radioValue = _value;
+                          this.setState(() {
+                            updateState = !updateState;
+                          });
+                        },
+                        child: const Text("Lọc", style: TextStyle(fontSize: 20))),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text("Huỷ bỏ", style: TextStyle(fontSize: 20)))
+                  ],
+                );
+              });
+            });
+      },
+    );
   }
 
   Row buildSearchField() {
@@ -211,24 +212,28 @@ class ServiceListScreenState extends State<ServiceListScreen> {
       children: [
         Container(
           padding: const EdgeInsets.all(15),
-          width: 400,
+          width: 350,
           child: TextField(
             controller: _txtSearch,
             decoration: InputDecoration(
               prefixIcon: IconButton(
                 onPressed: () {
-                  print("Searching...");
+                  setState(() {
+                    updateState = !updateState;
+                  });
                 },
                 icon: const Icon(Icons.search),
               ),
-              hintText: 'Tên dịch vụ',
+              hintText: 'Nhập tên dịch vụ cần tìm',
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
                   borderSide: const BorderSide(color: Colors.red)),
             ),
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             onChanged: (value) {
-              print("Change");
+              setState(() {
+                updateState = !updateState;
+              });
             }
           ),
         ),

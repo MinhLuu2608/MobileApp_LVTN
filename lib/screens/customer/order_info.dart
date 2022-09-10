@@ -1,11 +1,11 @@
 import 'package:MobileApp_LVTN/constants.dart';
 import 'package:MobileApp_LVTN/models/donhang.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 const urlAPI = url;
-
 class OrderInfo extends StatefulWidget{
   final DonHang donHang;
   OrderInfo({required this.donHang});
@@ -38,6 +38,18 @@ class OrderInfoState extends State<OrderInfo>{
     return response;
   }
 
+  cancelOrders() async {
+    final url = Uri.http(urlAPI, 'api/MobileApp/delete/${widget.donHang.idDonHang}');
+    final resp = await http.delete(url, headers: {
+      // "Access-Control-Allow-Origin": "*",
+      // "Access-Control-Allow-Credentials": "true",
+      "Content-type": "application/json",
+      // "Accept": "application/json"
+    });
+    final response = json.decode(resp.body);
+    print(response);
+    return response;
+  }
 
   Future refresh() async{
     setState(() {
@@ -93,10 +105,11 @@ class OrderInfoState extends State<OrderInfo>{
                   padding: const EdgeInsets.all(10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text("Địa chỉ:", style: headerStyle),
                       const SizedBox(width: 5),
-                      Text(widget.donHang.diaChiKh, style: contentStyle),
+                      Flexible(child: Text(widget.donHang.diaChiKh, style: contentStyle)),
                     ],
                   ),
                 ), // Địa chỉ
@@ -127,21 +140,15 @@ class OrderInfoState extends State<OrderInfo>{
                 widget.donHang.tinhTrangXuLy != 'Chờ xử lý' ? buildEmpInfo() :
                 widget.donHang.ngayHen != "Đơn hàng chưa xử lý" ? buildNgayHen() :
                 widget.donHang.tinhTrangXuLy == 'Đã hoàn thành' ? buildNgayThu() :
-                // const Padding(
-                //   padding: EdgeInsets.all(10),
-                //   child: Center(
-                //     child: Text("Chi tiết dịch vụ:", style: headerStyle),
-                //   )
-                // ),
                 buildTableHeader(context),
                 FutureBuilder(
                   future: getOrderServiceInfo(),
                   builder: (BuildContext context, AsyncSnapshot snapshot){
                     if(snapshot.connectionState != ConnectionState.done){
-                      return Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator());
                     }
                     if(snapshot.hasError){
-                      return Text("Something Wrong");
+                      return const Text("Something Wrong");
                     }
                     if(snapshot.hasData){
                       return ListView.builder(
@@ -158,6 +165,65 @@ class OrderInfoState extends State<OrderInfo>{
                     }
                     return const Text("Error while Calling API");
                   },
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 60),
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: const Color(0xC4e64c86),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
+                    ),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                          title: const Text("Huỷ đơn hàng"),
+                          content: const Text("Bạn có chắc chắn huỷ đơn hàng?"),
+                          actions: [
+                            TextButton(
+                              onPressed: () async{
+                                String response = await cancelOrders();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    backgroundColor: Colors.white30,
+                                    content: Text(response,
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                        )
+                                    )
+                                  )
+                                );
+                                if(response == 'Đơn hàng được huỷ thành công'){
+                                  Navigator.of(context).popUntil((route) => route.isFirst);
+                                }
+                              },
+                              child: const Text("OK"),
+
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text("CANCEL"),
+                            )
+                          ],
+                        )
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.cancel_outlined),
+                        SizedBox(width: 10),
+                        Text("Huỷ đơn hàng", style: TextStyle(fontSize: 22, letterSpacing: 2.2)),
+                      ],
+                    ),
+                  ),
                 )
               ],
             )
@@ -169,30 +235,33 @@ class OrderInfoState extends State<OrderInfo>{
 
   Row buildTableRow(BuildContext context, AsyncSnapshot<dynamic> snapshot, int index) {
     return Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.only(right: 5.0),
-                                width: MediaQuery.of(context).size.width * 0.30,
-                                child: Text(snapshot.data[index]['TenDichVu'], style: tableRowStyle),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.only(right: 5.0),
-                                width: MediaQuery.of(context).size.width * 0.22,
-                                child: Text(snapshot.data[index]['SoLuong'].toString(), style: tableRowStyle),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.only(right: 5.0),
-                                width: MediaQuery.of(context).size.width * 0.22,
-                                child: Text(snapshot.data[index]['DonGia'].toString(), style: tableRowStyle),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.only(right: 5.0),
-                                width: MediaQuery.of(context).size.width * 0.22,
-                                child: Text(snapshot.data[index]['TongTienDV'].toString(), style: tableRowStyle),
-                              ),
-                            ],
-                          );
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.only(right: 5.0),
+          width: MediaQuery.of(context).size.width * 0.29,
+          child: Text(snapshot.data[index]['TenDichVu'], style: tableRowStyle),
+        ),
+        Container(
+          padding: const EdgeInsets.only(right: 5.0),
+          width: MediaQuery.of(context).size.width * 0.22,
+          child: Text(snapshot.data[index]['SoLuong'].toString(),
+              style: tableRowStyle),
+        ),
+        Container(
+          padding: const EdgeInsets.only(right: 5.0),
+          width: MediaQuery.of(context).size.width * 0.22,
+          child: Text(snapshot.data[index]['DonGia'].toString(),
+              style: tableRowStyle),
+        ),
+        Container(
+          padding: const EdgeInsets.only(right: 5.0),
+          width: MediaQuery.of(context).size.width * 0.22,
+          child: Text(snapshot.data[index]['TongTienDV'].toString(),
+              style: tableRowStyle),
+        ),
+      ],
+    );
   }
 
   Padding buildTableHeader(BuildContext context) {
@@ -203,7 +272,7 @@ class OrderInfoState extends State<OrderInfo>{
         children: [
           Container(
             padding: const EdgeInsets.only(right: 5.0),
-            width: MediaQuery.of(context).size.width * 0.30,
+            width: MediaQuery.of(context).size.width * 0.29,
             child: const Text("Tên dịch vụ", style: tableHeaderStyle),
           ),
           Container(

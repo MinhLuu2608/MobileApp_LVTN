@@ -26,18 +26,32 @@ class OrderListScreenState extends State<OrderListScreen> {
 
   late Box box1;
   Future<List<DonHang>> getDonHang() async {
-    box1 = await Hive.openBox('logindata');
-    final int IDAccount = box1.get("IDAccount");
-    final url = Uri.http(urlAPI, 'api/MobileApp/getCustomerOrders/$IDAccount/$radioValue');
+    if(_txtSearch.text.isEmpty){
+      box1 = await Hive.openBox('logindata');
+      final int IDAccount = box1.get("IDAccount");
+      final url = Uri.http(urlAPI, 'api/MobileApp/getCustomerOrders/$IDAccount/$radioValue');
 
-    final resp = await http.get(url, headers: {
-      // "Access-Control-Allow-Origin": "*",
-      // "Access-Control-Allow-Credentials": "true",
-      "Content-type": "application/json",
-      // "Accept": "application/json"
-    });
-    final response = donHangFromJson(resp.body);
-    return response;
+      final resp = await http.get(url, headers: {
+        // "Access-Control-Allow-Origin": "*",
+        // "Access-Control-Allow-Credentials": "true",
+        "Content-type": "application/json",
+        // "Accept": "application/json"
+      });
+      final response = donHangFromJson(resp.body);
+      return response;
+    }
+    else{
+      String maHD = _txtSearch.text.toUpperCase();
+      final url = Uri.http(urlAPI, 'api/MobileApp/getSearchOrder/$maHD');
+      final resp = await http.get(url, headers: {
+        // "Access-Control-Allow-Origin": "*",
+        // "Access-Control-Allow-Credentials": "true",
+        "Content-type": "application/json",
+        // "Accept": "application/json"
+      });
+      final response = donHangFromJson(resp.body);
+      return response;
+    }
   }
 
   showImage(String image){
@@ -75,9 +89,19 @@ class OrderListScreenState extends State<OrderListScreen> {
                         return Padding(
                           padding: const EdgeInsets.all(3),
                           child: InkWell(
-                            onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
+                            onTap: () async{
+                              final refresh = await Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) => OrderInfo(donHang: snapshot.data[index])));
+                              // if(refresh == true){
+                              //   setState(() {
+                              //     updateState = !updateState;
+                              //   });
+                              // }
+                              if(refresh == null){
+                                setState(() {
+                                  updateState = !updateState;
+                                });
+                              }
                             },
                             child: buildDonHang(snapshot, index),
                           ),
@@ -120,6 +144,10 @@ class OrderListScreenState extends State<OrderListScreen> {
                   padding: const EdgeInsets.all(5.0),
                   child: Text(snapshot.data[index].ngayTao, style: styleContent),
                 ), // Ngày tạo
+                Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: buildTextTinhTrangXuLy(snapshot, index),
+                ), // Tình trạng xử lý
               ],
             ),
           ),
@@ -138,6 +166,52 @@ class OrderListScreenState extends State<OrderListScreen> {
         ],
       ),
     );
+  }
+
+  buildTextTinhTrangXuLy(AsyncSnapshot<dynamic> snapshot, int index) {
+    if(snapshot.data[index].tinhTrangXuLy == "Chờ xử lý") {
+      return Row(
+        children: [
+          Text("Tình trạng xử lý: ", style: const TextStyle(fontSize: 20,)),
+          Text(snapshot.data[index].tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.pinkAccent)),
+        ],
+      );
+    }
+    if(snapshot.data[index].tinhTrangXuLy == "Đã tiếp nhận"){
+      return Row(
+        children: [
+          Text("Tình trạng xử lý: ", style: const TextStyle(fontSize: 20,)),
+          Text(snapshot.data[index].tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.blue)),
+        ],
+      );
+    }
+    if(snapshot.data[index].tinhTrangXuLy == "Đã hoàn thành"){
+      return Row(
+        children: [
+          Text("Tình trạng xử lý: ", style: const TextStyle(fontSize: 20,)),
+          Text(snapshot.data[index].tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.green)),
+        ],
+      );
+    }
+    if(snapshot.data[index].tinhTrangXuLy == "Đã bị huỷ"){
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text("Tình trạng xử lý: ", style: const TextStyle(fontSize: 20,)),
+              Text("${snapshot.data[index].tinhTrangXuLy} ", style: const TextStyle(fontSize: 20, color: Colors.grey)),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Text("Lý do: ${snapshot.data[index].note}", style: const TextStyle(fontSize: 20)),
+          )
+        ],
+      );
+    }
+    return Text(snapshot.data[index].tinhTrangXuLy);
   }
 
   FloatingActionButton buildFilter(BuildContext context) {
@@ -233,24 +307,28 @@ class OrderListScreenState extends State<OrderListScreen> {
       children: [
         Container(
           padding: const EdgeInsets.all(15),
-          width: 400,
+          width: 350,
           child: TextField(
               controller: _txtSearch,
               decoration: InputDecoration(
                 prefixIcon: IconButton(
                   onPressed: () {
-                    print("Searching...");
+                    setState(() {
+                      updateState = !updateState;
+                    });
                   },
                   icon: const Icon(Icons.search),
                 ),
-                hintText: 'Tên dịch vụ',
+                hintText: 'Nhập mã đơn hàng cần tìm',
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                     borderSide: const BorderSide(color: Colors.red)),
               ),
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               onChanged: (value) {
-                print("Change");
+                setState(() {
+                  updateState = !updateState;
+                });
               }
           ),
         ),

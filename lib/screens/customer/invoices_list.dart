@@ -80,9 +80,12 @@ class InvoicesListState extends State<InvoicesList> {
                     padding: const EdgeInsets.all(3),
                     child: InkWell(
                       onTap: (){
-                        Navigator.of(context).push(
+                        final result = Navigator.of(context).push(
                             MaterialPageRoute(builder: (context) => InvoiceInfo(idHoaDon: snapshot.data[index].idHoaDon)
                             ));
+                        if(result == null){
+                          updateState = !updateState;
+                        }
                       },
                       child: Card(
                         shape: RoundedRectangleBorder(

@@ -2,7 +2,6 @@ import 'package:MobileApp_LVTN/screens/customer/services_screen.dart';
 import 'package:MobileApp_LVTN/screens/settings.dart';
 
 import 'invoices_screen.dart';
-import 'package:MobileApp_LVTN/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget{
@@ -17,14 +16,14 @@ class _HomeScreenState extends State<HomeScreen>{
   static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
   List<Widget> title = [
-    Text('Trang chủ', style: optionStyle),
-    Text('Hoá đơn', style: optionStyle),
-    Text('Dịch vụ', style: optionStyle),
-    Text('Cài đặt', style: optionStyle),
+    const Text('Trang chủ', style: optionStyle),
+    const Text('Hoá đơn', style: optionStyle),
+    const Text('Dịch vụ', style: optionStyle),
+    const Text('Cài đặt', style: optionStyle),
   ];
 
   List<Widget> screens = [
-    Text('Home', style: optionStyle),
+    const Text('Home', style: optionStyle),
     InvoicesScreen(),
     ServicesScreen(),
     SettingsPage(),
@@ -47,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen>{
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Trang chủ"),
           BottomNavigationBarItem(icon: Icon(Icons.receipt), label: "Hoá đơn"),
           BottomNavigationBarItem(icon: Icon(Icons.cleaning_services_sharp), label: "Dịch vụ"),

@@ -13,12 +13,10 @@ class ServiceInfo extends StatefulWidget {
   ServiceInfo({required this.dichVuInfo});
 
   @override
-  ServiceInfoState createState() => ServiceInfoState(dichVuInfo: dichVuInfo);
+  ServiceInfoState createState() => ServiceInfoState();
 }
 
 class ServiceInfoState extends State<ServiceInfo> {
-  final DichVu dichVuInfo;
-  ServiceInfoState({required this.dichVuInfo});
 
   static const TextStyle optionMainStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
   static const TextStyle styleContent = TextStyle(fontSize: 20);
@@ -70,10 +68,11 @@ class ServiceInfoState extends State<ServiceInfo> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Tên dịch vụ", style: optionMainStyle),
+                const Text("Tên dịch vụ:", style: optionMainStyle),
                 const  SizedBox(width: 10),
-                Text(dichVuInfo.tenDichVu, style: styleContent)
+                Flexible(child: Text(widget.dichVuInfo.tenDichVu, style: styleContent))
               ],
             ),
           ), // Tên dịch vụ
@@ -81,9 +80,9 @@ class ServiceInfoState extends State<ServiceInfo> {
             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
             child: Row(
               children: [
-                const Text("Loại dịch vụ", style: optionMainStyle),
+                const Text("Loại dịch vụ:", style: optionMainStyle),
                 const  SizedBox(width: 10),
-                Text(dichVuInfo.loaiDichVu, style: styleContent)
+                Text(widget.dichVuInfo.loaiDichVu, style: styleContent)
               ],
             ),
           ), // Loại dịch vụ
@@ -93,7 +92,7 @@ class ServiceInfoState extends State<ServiceInfo> {
               children: [
                 const Text("Đơn giá: ", style: optionMainStyle),
                 const  SizedBox(width: 10),
-                Text("${dichVuInfo.donGiaDv}/${dichVuInfo.donViTinh}", style: styleContent)
+                Text("${widget.dichVuInfo.donGiaDv}/${widget.dichVuInfo.donViTinh}", style: styleContent)
               ],
             ),
           ), // Loại dịch vụ
@@ -103,7 +102,7 @@ class ServiceInfoState extends State<ServiceInfo> {
           ), // Mô tả dịch vụ header
           Padding(
               padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
-              child:  Text(dichVuInfo.moTaDichVu, style: styleContent)
+              child:  Text(widget.dichVuInfo.moTaDichVu, style: styleContent)
           ), // Mô tả dịch vụ nội dung
           Expanded(child: buildButtonRequest())
         ],

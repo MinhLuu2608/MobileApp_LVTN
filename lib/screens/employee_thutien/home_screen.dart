@@ -1,7 +1,6 @@
 import 'package:MobileApp_LVTN/screens/employee_thutien/emp_info.dart';
 import 'package:MobileApp_LVTN/screens/settings.dart';
 import 'invoice_screen.dart';
-import 'package:MobileApp_LVTN/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 
 class EmpThuTienHomeScreen extends StatefulWidget{
