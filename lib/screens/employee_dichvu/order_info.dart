@@ -1,9 +1,11 @@
 import 'package:MobileApp_LVTN/constants.dart';
 import 'package:MobileApp_LVTN/models/donhang.dart';
-import 'package:MobileApp_LVTN/models/chitiet_dichvu.dart';
+import 'package:MobileApp_LVTN/screens/employee_dichvu/order_cancel.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 
 final urlAPI = url;
@@ -21,15 +23,19 @@ class OrderInfoState extends State<OrderInfo>{
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  late Box box1;
+
   var dichVuList;
   var updateState = false;
 
   static const TextStyle headerStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
   static const TextStyle contentStyle = TextStyle(fontSize: 20,);
   static const TextStyle chuaThuStyle = TextStyle(fontSize: 20, color: Colors.pink);
+  static const TextStyle tableHeaderStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.bold);
+  static const TextStyle tableRowStyle = TextStyle(fontSize: 14);
 
-  Future<List<DonHang>> getDonHangInfo() async {
-    final url = Uri.http(urlAPI, 'api/MobileApp/getEmpOrdersInfo/${widget.idDonHang}');
+  getHoaDon() async {
+    final url = Uri.http(urlAPI, 'api/MobileApp/getOrderInfo/${widget.idDonHang}');
     final resp = await http.get(url, headers: {
       // "Access-Control-Allow-Origin": "*",
       // "Access-Control-Allow-Credentials": "true",
@@ -37,19 +43,18 @@ class OrderInfoState extends State<OrderInfo>{
       // "Accept": "application/json"
     });
     final response = donHangFromJson(resp.body);
-    dichVuList = await getDichVuList();
     return response;
   }
 
-  Future<List<ChiTietDichVu>> getDichVuList() async {
-    final url = Uri.http(urlAPI, 'api/MobileApp/getEmpOrdersServiceInfo/${widget.idDonHang}');
+  getServiceList() async {
+    final url = Uri.http(urlAPI, 'api/MobileApp/getOrdersServiceInfo/${widget.idDonHang}');
     final resp = await http.get(url, headers: {
       // "Access-Control-Allow-Origin": "*",
       // "Access-Control-Allow-Credentials": "true",
       "Content-type": "application/json",
       // "Accept": "application/json"
     });
-    final response = dichVuFromJson(resp.body);
+    final response = json.decode(resp.body);
     return response;
   }
 
@@ -59,7 +64,6 @@ class OrderInfoState extends State<OrderInfo>{
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,169 +71,280 @@ class OrderInfoState extends State<OrderInfo>{
       appBar: AppBar(
         title: const Padding(padding: EdgeInsets.only(left: 50), child: Text('Chi tiết hoá đơn')),
       ),
-      body: FutureBuilder(
-        future: getDonHangInfo(),
-        builder: (BuildContext context, AsyncSnapshot snapshot){
-          if(snapshot.connectionState != ConnectionState.done){
-            return Center(child: CircularProgressIndicator());
-          }
-          if(snapshot.hasError){
-            return Text("Something Wrong");
-          }
-          if(snapshot.hasData){
-            return SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: Center(
-                        child: Text("Đơn hàng ${snapshot.data[0].maDonHang}",
-                            style: const TextStyle( fontSize: 30, fontWeight: FontWeight.bold))),
-                  ), // Title đơn hàng
-                  Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Tên khách hàng",
-                          style: headerStyle,
-                        ),
-                        const SizedBox(width: 5),
-                        Text(snapshot.data[0].tenKhachHang, style: contentStyle),
-                      ],
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          const SizedBox(height: 20),
+          FutureBuilder(
+            future: getHoaDon(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return const Text("Something Wrong");
+              }
+              if (snapshot.hasData) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    buildOrderInfo(snapshot),
+                    const Padding(
+                        padding: EdgeInsets.all(5),
+                        child: Text("Danh sách dịch vụ", style: headerStyle)
                     ),
-                  ), // Tên khách hàng
-                  Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: FutureBuilder(
+                          future: getServiceList(),
+                          builder: (BuildContext context, AsyncSnapshot snapshot2) {
+                            if (snapshot2.connectionState != ConnectionState.done) {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                            if (snapshot2.hasError) {
+                              return const Text("Something Wrong");
+                            }
+                            if (snapshot2.hasData) {
+                              return ListView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: snapshot2.data.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return buildTableRow(context, snapshot2, index);
+                                },
+                              );
+                            }
+                            return const Text("Error while Calling API");
+                          },
+                        )
+                    ), //Dịch vụ list
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        const Text("Địa chỉ:", style: headerStyle),
-                        const SizedBox(width: 5),
-                        Flexible(child: Text(snapshot.data[0].diaChiKh,style: contentStyle)),
+                        if (snapshot.data[0].tinhTrangXuLy == 'Chờ xử lý') buildButtonChoXuLy(context),
+                        if (snapshot.data[0].tinhTrangXuLy == 'Đã tiếp nhận') buildButtonChoXuLy(context),
                       ],
-                    ),
-                  ), // Địa chỉ khách hàng
-                  Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        const Text("Số điện thoại:", style: headerStyle),
-                        const SizedBox(width: 5),
-                        Text(snapshot.data[0].soDienThoaiKh, style: contentStyle),
-                      ],
-                    ),
-                  ), // Số điện thoại KH
-                  Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: (buildTextTinhTrangXuLy(snapshot))
-                  ), // Tình trạng xử lý
-                  Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text("Ngày thu:", style: headerStyle),
-                        const SizedBox(width: 5),
-                        snapshot.data[0].ngayThu == "Chưa thu"
-                            ? Text(snapshot.data[0].ngayThu,
-                                style: chuaThuStyle)
-                            : Text(snapshot.data[0].ngayThu,
-                                style: contentStyle)
-                      ],
-                    ),
-                  ), // Ngày thu
-                  Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: Text("Danh sách dịch vụ", style: headerStyle)
-                  ), //Danh sách dịch vụ header
-                  Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: buildTableDichVu()
-                  ), //Dịch vụ list
-                ],
+                    )
+                  ],
+                );
+              }
+              return const Text("Error while Calling API");
+            },
+          ),
+        ],
+      )
+    );
+  }
+
+  Column buildOrderInfo(AsyncSnapshot<dynamic> snapshot) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(5),
+          child: Center(
+            child: Text("Đơn hàng ${snapshot.data[0].maDonHang}", style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold))),
+        ), // Title đơn hàng
+        Padding(
+          padding: const EdgeInsets.all(5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Text(
+                "Tên khách hàng",
+                style: headerStyle,
               ),
-            );
-          }
-          return Text("Error while Calling API");
-        },
+              const SizedBox(width: 5),
+              Text(snapshot.data[0].tenKhachHang, style: contentStyle),
+            ],
+          ),
+        ), // Tên khách hàng
+        Padding(
+          padding: const EdgeInsets.all(5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text("Địa chỉ:", style: headerStyle),
+              const SizedBox(width: 5),
+              Flexible(
+                  child: Text(snapshot.data[0].diaChiKh, style: contentStyle)),
+            ],
+          ),
+        ), // Địa chỉ khách hàng
+        Padding(
+          padding: const EdgeInsets.all(5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Text("Số điện thoại:", style: headerStyle),
+              const SizedBox(width: 5),
+              Text(snapshot.data[0].soDienThoaiKh, style: contentStyle),
+            ],
+          ),
+        ), // Số điện thoại KH
+        Padding(
+            padding: const EdgeInsets.all(5.0),
+            child:
+                (buildTextTinhTrangXuLy(snapshot.data[0]))), // Tình trạng xử lý
+        Padding(
+          padding: const EdgeInsets.all(5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Text("Ngày thu:", style: headerStyle),
+              const SizedBox(width: 5),
+              snapshot.data[0].ngayThu == "Chưa thu"
+                  ? Text(snapshot.data[0].ngayThu, style: chuaThuStyle)
+                  : Text(snapshot.data[0].ngayThu, style: contentStyle)
+            ],
+          ),
+        ), // Ngày thu
+      ],
+    );
+  }
+
+  Row buildButtonChoXuLy(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20.0),
+          child: OutlinedButton(
+            style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                backgroundColor: Colors.lightGreen),
+            onPressed: () {
+            },
+            child: const Text("Nhận đơn hàng", style: TextStyle( fontSize: 15, letterSpacing: 2.2, color: Colors.black)),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20.0, left: 10.0),
+          child: OutlinedButton(
+            style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                backgroundColor: Colors.purpleAccent),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => OrderCancel(idDonHang: widget.idDonHang)));
+            },
+            child: const Text("Huỷ đơn hàng", style: TextStyle( fontSize: 15, letterSpacing: 2.2, color: Colors.black)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Padding buildTableRow(BuildContext context, AsyncSnapshot<dynamic> snapshot, int index) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, right: 5.0, bottom: 15.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.only(right: 5.0),
+            width: MediaQuery.of(context).size.width * 0.29,
+            child: Center(child: Text(snapshot.data[index]['TenDichVu'], style: tableRowStyle)),
+          ),
+          Container(
+            padding: const EdgeInsets.only(right: 5.0),
+            width: MediaQuery.of(context).size.width * 0.20,
+            child: Center(child: Text(snapshot.data[index]['SoLuong'].toString(), style: tableRowStyle),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.only(right: 5.0),
+            width: MediaQuery.of(context).size.width * 0.20,
+            child: Center(child: Text(snapshot.data[index]['DonGia'].toString(), style: tableRowStyle)),
+          ),
+          Container(
+            padding: const EdgeInsets.only(right: 5.0),
+            width: MediaQuery.of(context).size.width * 0.20,
+            child: Center(child: Text(snapshot.data[index]['TongTienDV'].toString(), style: tableRowStyle)),
+          ),
+        ],
       ),
     );
   }
 
-  Table buildTableDichVu() {
-    return Table(
-      border: TableBorder.all(),
-      columnWidths: const <int, TableColumnWidth>{
-        0: FractionColumnWidth(0.3),
-        1: FractionColumnWidth(0.1),
-        2: FractionColumnWidth(0.2),
-        3: FractionColumnWidth(0.2),
-        4: FractionColumnWidth(0.2)
-      },
-      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-      children: <TableRow>[
-        TableRow(
-          children: <Widget>[
-            Text("Tên dịch vụ", style: headerStyle),
-            Text("ĐVT", style: headerStyle),
-            Text("Đơn giá", style: headerStyle),
-            Text("SL", style: headerStyle),
-            Text("Tổng", style: headerStyle),
-          ],
-        )
-      ]
+  Padding buildTableHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, right: 5.0, bottom: 15.0, top: 10.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.only(right: 5.0),
+            width: MediaQuery.of(context).size.width * 0.29,
+            child: const Center(child: Text("Tên dịch vụ", style: tableHeaderStyle)),
+          ),
+          Container(
+            padding: const EdgeInsets.only(right: 5.0),
+            width: MediaQuery.of(context).size.width * 0.20,
+            child: const Center(child: Text("Số lượng", style: tableHeaderStyle)),
+          ),
+          Container(
+            padding: const EdgeInsets.only(right: 5.0),
+            width: MediaQuery.of(context).size.width * 0.20,
+            child: const Center(child: Text("Đơn giá", style: tableHeaderStyle)),
+          ),
+          Container(
+            padding: const EdgeInsets.only(right: 5.0),
+            width: MediaQuery.of(context).size.width * 0.20,
+            child: const Center(child: Text("Tổng", style: tableHeaderStyle)),
+          ),
+        ],
+      ),
     );
   }
 
-  buildTextTinhTrangXuLy(AsyncSnapshot<dynamic> snapshot) {
-    if(snapshot.data[0].tinhTrangXuLy == "Chờ xử lý") {
-      return Row(
-        children: [
-          Text("Tình trạng xử lý: ", style: const TextStyle(fontSize: 20,)),
-          Text(snapshot.data[0].tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.pinkAccent)),
-        ],
-      );
-    }
-    if(snapshot.data[0].tinhTrangXuLy == "Đã tiếp nhận"){
+  buildTextTinhTrangXuLy(DonHang donHang) {
+    if(donHang.tinhTrangXuLy == "Chờ xử lý") {
       return Row(
         children: [
           Text("Tình trạng xử lý: ", style: headerStyle),
-          Text(snapshot.data[0].tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.blue)),
+          Text(donHang.tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.pinkAccent)),
         ],
       );
     }
-    if(snapshot.data[0].tinhTrangXuLy == "Đã hoàn thành"){
+    if(donHang.tinhTrangXuLy == "Đã tiếp nhận"){
       return Row(
         children: [
           Text("Tình trạng xử lý: ", style: headerStyle),
-          Text(snapshot.data[0].tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.green)),
+          Text(donHang.tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.blue)),
         ],
       );
     }
-    if(snapshot.data[0].tinhTrangXuLy == "Đã bị huỷ"){
+    if(donHang.tinhTrangXuLy == "Đã hoàn thành"){
+      return Row(
+        children: [
+          Text("Tình trạng xử lý: ", style: headerStyle),
+          Text(donHang.tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.green)),
+        ],
+      );
+    }
+    if(donHang.tinhTrangXuLy == "Đã bị huỷ"){
       return Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Text("Tình trạng xử lý: ", style: headerStyle),
-              Text("${snapshot.data[0].tinhTrangXuLy} ", style: const TextStyle(fontSize: 20, color: Colors.grey)),
+              const Text("Tình trạng xử lý: ", style: headerStyle),
+              Text("${donHang.tinhTrangXuLy} ", style: const TextStyle(fontSize: 20, color: Colors.grey)),
             ],
           ),
           Padding(
             padding: const EdgeInsets.all(5.0),
-            child: Text("Lý do: ${snapshot.data[0].note}", style: const TextStyle(fontSize: 20)),
+            child: Text("Lý do: ${donHang.note}", style: const TextStyle(fontSize: 20)),
           )
         ],
       );
     }
-    return Text(snapshot.data[0].tinhTrangXuLy);
+    return Text(donHang.tinhTrangXuLy);
   }
 
   AlertDialog buildAlertDialogWarning() {
@@ -267,54 +382,5 @@ class OrderInfoState extends State<OrderInfo>{
       ),
     );
   }
-
-  checkAbleToPay(int idHoaDon) async{
-    final url = Uri.http(urlAPI, 'api/MobileApp/isAbleToPay/$idHoaDon');
-    final resp = await http.get(url, headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Credentials": "true",
-      "Content-type": "application/json",
-      "Accept": "application/json"
-    });
-    final response = resp.body;
-
-    if(response == "true") {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-
-  Future<String> getHinhThucThanhToan(int idHoaDon) async {
-    final url = Uri.http(urlAPI, 'api/MobileApp/PaymentType/$idHoaDon');
-    final resp = await http.get(url, headers: {
-      // "Access-Control-Allow-Origin": "*",
-      // "Access-Control-Allow-Credentials": "true",
-      "Content-type": "application/json",
-      // "Accept": "application/json"
-    });
-    final response = resp.body;
-    return response;
-  }
-
-  handleConfirm({required int idHoaDon, required int idNhanVien, required int idTuyenThu}) async{
-    final url = Uri.http(urlAPI, 'api/MobileApp/confirm/');
-    var jsonBody = {
-      'IDHoaDon': idHoaDon,
-      'IDNhanVien': idNhanVien,
-      'IDTuyenThu': idTuyenThu
-    };
-    String jsonStr = json.encode(jsonBody);
-    final resp = await http.post(url, body: jsonStr, headers: {
-      // "Access-Control-Allow-Origin": "*",
-      // "Access-Control-Allow-Credentials": "true",
-      "Content-type": "application/json",
-      // "Accept": "application/json"
-    });
-    final response = resp.body;
-    return response;
-  }
-
 
 }

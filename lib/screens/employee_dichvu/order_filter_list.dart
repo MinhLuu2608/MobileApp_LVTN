@@ -43,8 +43,7 @@ class OrderFilterListState extends State<OrderFilterList> {
   getHoaDon() async {
     box1 = await Hive.openBox('logindata');
     final int IDAccount = box1.get("IDAccount");
-    final url = Uri.http(
-        urlAPI, 'api/MobileApp/getEmpOrders/$IDAccount/${widget.filterType}');
+    final url = Uri.http(urlAPI, 'api/MobileApp/getEmpOrders/$IDAccount/${widget.filterType}');
 
     final resp = await http.get(url, headers: {
       // "Access-Control-Allow-Origin": "*",
@@ -98,11 +97,16 @@ class OrderFilterListState extends State<OrderFilterList> {
     return Padding(
       padding: const EdgeInsets.all(3),
       child: InkWell(
-        onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(
+        onTap: () async{
+          final response = await Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => OrderInfo(
                   idDonHang: snapshot.data[index].idDonHang,
                   )));
+          if(response == null){
+            setState(() {
+              updateState = !updateState;
+            });
+          }
         },
         child: Card(
           shape:
@@ -153,7 +157,7 @@ class OrderFilterListState extends State<OrderFilterList> {
     if(snapshot.data[index].tinhTrangXuLy == "Chờ xử lý") {
       return Row(
         children: [
-          Text("Tình trạng xử lý: ", style: const TextStyle(fontSize: 20,)),
+          const Text("Tình trạng xử lý: ", style: TextStyle(fontSize: 20,)),
           Text(snapshot.data[index].tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.pinkAccent)),
         ],
       );
@@ -161,7 +165,7 @@ class OrderFilterListState extends State<OrderFilterList> {
     if(snapshot.data[index].tinhTrangXuLy == "Đã tiếp nhận"){
       return Row(
         children: [
-          Text("Tình trạng xử lý: ", style: const TextStyle(fontSize: 20,)),
+          const Text("Tình trạng xử lý: ", style: TextStyle(fontSize: 20,)),
           Text(snapshot.data[index].tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.blue)),
         ],
       );
@@ -169,7 +173,7 @@ class OrderFilterListState extends State<OrderFilterList> {
     if(snapshot.data[index].tinhTrangXuLy == "Đã hoàn thành"){
         return Row(
           children: [
-            Text("Tình trạng xử lý: ", style: const TextStyle(fontSize: 20,)),
+            const Text("Tình trạng xử lý: ", style: TextStyle(fontSize: 20,)),
             Text(snapshot.data[index].tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.green)),
           ],
         );
@@ -181,7 +185,7 @@ class OrderFilterListState extends State<OrderFilterList> {
         children: [
           Row(
             children: [
-              Text("Tình trạng xử lý: ", style: const TextStyle(fontSize: 20,)),
+              const Text("Tình trạng xử lý: ", style: TextStyle(fontSize: 20,)),
               Text("${snapshot.data[index].tinhTrangXuLy} ", style: const TextStyle(fontSize: 20, color: Colors.grey)),
             ],
           ),

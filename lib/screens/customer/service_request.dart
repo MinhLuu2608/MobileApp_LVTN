@@ -147,7 +147,7 @@ class ServiceRequestState extends State<ServiceRequest> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  buildButtonConfirm(context,accountInfo,editStatus),
+                  buildButtonConfirm(context),
                 ],
               ),
             )
@@ -209,7 +209,7 @@ class ServiceRequestState extends State<ServiceRequest> {
     );
   }
 
-  Row buildButtonConfirm(BuildContext context, Account accountInfo, bool editStatus) {
+  Row buildButtonConfirm(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

@@ -46,9 +46,9 @@ class InvoiceFilterListState extends State<InvoiceFilterList> {
 
   getHoaDon() async {
     box1 = await Hive.openBox('logindata');
-    final int IDAccount = box1.get("IDAccount");
+    final int IDNhanVien = box1.get("IDNhanVien");
     final url = Uri.http(
-        urlAPI, 'api/MobileApp/getEmpFilter/$IDAccount/${widget.filterType}');
+        urlAPI, 'api/MobileApp/getEmpFilter/$IDNhanVien/${widget.filterType}');
 
     final resp = await http.get(url, headers: {
       // "Access-Control-Allow-Origin": "*",
