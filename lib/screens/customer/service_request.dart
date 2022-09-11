@@ -30,8 +30,6 @@ class ServiceRequestState extends State<ServiceRequest> {
   final _txtHoTen = TextEditingController();
   final _txtSDT = TextEditingController();
   final _txtDiaChi = TextEditingController();
-  final _txtSoLuong = TextEditingController(text: '1');
-  var _tongTien = 0;
   var updateState = false;
 
   late Box box1;
@@ -62,7 +60,6 @@ class ServiceRequestState extends State<ServiceRequest> {
     _txtHoTen.text = response[0].hoTen;
     _txtDiaChi.text = response[0].diaChi;
     _txtSDT.text = response[0].sdt;
-    _tongTien = int.parse(_txtSoLuong.text) * widget.dichVu.donGiaDv;
     return response;
   }
 
@@ -76,11 +73,32 @@ class ServiceRequestState extends State<ServiceRequest> {
     return "OK";
   }
 
+  handleConfirm() async{
+    box1 = await Hive.openBox('logindata');
+    final int IDAccount = box1.get("IDAccount");
+    final url = Uri.http(urlAPI, 'api/MobileApp/request/${widget.dichVu.idDichVu}');
+    var jsonBody = {
+      'IDAccount': IDAccount,
+      'TenKhachHang': _txtHoTen.text,
+      'DiaChiKH': _txtDiaChi.text,
+      'SoDienThoaiKH': _txtSDT.text
+    };
+    String jsonStr = json.encode(jsonBody);
+    final resp = await http.post(url, body: jsonStr, headers: {
+      // "Access-Control-Allow-Origin": "*",
+      // "Access-Control-Allow-Credentials": "true",
+      "Content-type": "application/json",
+      // "Accept": "application/json"
+    });
+    final response = resp.body;
+    return response;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Thông tin cá nhân"),
+        title: const Text("Yêu cầu dịch vụ"),
       ),
       body: FutureBuilder(
         future: getAccount(),
@@ -107,14 +125,12 @@ class ServiceRequestState extends State<ServiceRequest> {
         onTap: () {
           FocusScope.of(context).unfocus();
         },
-        child: ListView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Center(
-              child: Text("Yêu cầu dịch vụ", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold))
-            ),
-            const SizedBox(height: 35),
+            const SizedBox(height: 15),
             const Padding(
-              padding: const EdgeInsets.only(bottom: 35),
+              padding: EdgeInsets.only(bottom: 35),
               child: Center(child: Text("Thông tin khách hàng:", style: headerStyle))
             ),
             buildTextField("Họ và tên", accountInfo.hoTen, _txtHoTen, false, editStatus),
@@ -122,12 +138,19 @@ class ServiceRequestState extends State<ServiceRequest> {
             buildTextField("Địa chỉ", accountInfo.diaChi, _txtDiaChi, false, editStatus),
             const SizedBox(height: 25),
             const Padding(
-                padding: const EdgeInsets.only(bottom: 15),
+                padding: EdgeInsets.only(bottom: 15),
                 child: Center(child: Text("Thông tin dịch vụ:", style: headerStyle))
             ),
             buildTableHeader(context),
             buildTableRow(context),
-            buildButtonConfirm(context,accountInfo,editStatus)
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  buildButtonConfirm(context,accountInfo,editStatus),
+                ],
+              ),
+            )
           ],
         ),
       ),
@@ -142,32 +165,18 @@ class ServiceRequestState extends State<ServiceRequest> {
         children: [
           Container(
             padding: const EdgeInsets.only(right: 5.0),
-            width: MediaQuery.of(context).size.width * 0.32,
+            width: MediaQuery.of(context).size.width * 0.4,
             child: Center(child: Text(widget.dichVu.tenDichVu, style: tableRowStyle)),
           ),
           Container(
             padding: const EdgeInsets.only(right: 5.0),
-            width: MediaQuery.of(context).size.width * 0.20,
-            child: TextField(
-              controller: _txtSoLuong,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
-              ],
-              onChanged: (value) {
-                _tongTien = int.parse(value) * widget.dichVu.donGiaDv;
-              },
-            )
+            width: MediaQuery.of(context).size.width * 0.25,
+            child: Center(child: Text(widget.dichVu.donViTinh, style: tableRowStyle)),
           ),
           Container(
             padding: const EdgeInsets.only(right: 5.0),
-            width: MediaQuery.of(context).size.width * 0.22,
+            width: MediaQuery.of(context).size.width * 0.25,
             child: Center(child: Text(widget.dichVu.donGiaDv.toString(), style: tableRowStyle)),
-          ),
-          Container(
-            padding: const EdgeInsets.only(right: 5.0),
-            width: MediaQuery.of(context).size.width * 0.22,
-            child: Center(child: Text(_tongTien.toString(), style: tableRowStyle)),
           ),
         ],
       ),
@@ -182,23 +191,18 @@ class ServiceRequestState extends State<ServiceRequest> {
         children: [
           Container(
             padding: const EdgeInsets.only(right: 5.0),
-            width: MediaQuery.of(context).size.width * 0.32,
+            width: MediaQuery.of(context).size.width * 0.4,
             child: const Center(child: Text("Tên dịch vụ", style: tableHeaderStyle)),
           ),
           Container(
             padding: const EdgeInsets.only(right: 5.0),
-            width: MediaQuery.of(context).size.width * 0.20,
-            child: const Center(child: Text("Số lượng", style: tableHeaderStyle)),
+            width: MediaQuery.of(context).size.width * 0.25,
+            child: const Center(child: Text("Đơn vị tính", style: tableHeaderStyle)),
           ),
           Container(
             padding: const EdgeInsets.only(right: 5.0),
-            width: MediaQuery.of(context).size.width * 0.22,
+            width: MediaQuery.of(context).size.width * 0.25,
             child: const Center(child: Text("Đơn giá", style: tableHeaderStyle)),
-          ),
-          Container(
-            padding: const EdgeInsets.only(right: 5.0),
-            width: MediaQuery.of(context).size.width * 0.22,
-            child: const Center(child: Text("Tổng tiền", style: tableHeaderStyle)),
           ),
         ],
       ),
@@ -209,19 +213,32 @@ class ServiceRequestState extends State<ServiceRequest> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        OutlinedButton(
-          style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 50),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-              backgroundColor: Colors.lightGreen),
-          onPressed: () {
-            setState(() {
-              this.editStatus = !this.editStatus;
-            });
-          },
-          child: const Text("Xác nhận", style: TextStyle( fontSize: 15, letterSpacing: 2.2, color: Colors.black)),
-        )
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20.0),
+          child: OutlinedButton(
+            style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 80),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+                backgroundColor: Colors.lightGreen),
+            onPressed: () async{
+              String validString = checkValid();
+              if(validString != "OK") {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(validString, style: const TextStyle(fontSize: 20),))
+                );
+              }
+              else{
+                final response = await handleConfirm();
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(response, style: const TextStyle(fontSize: 20)))
+                );
+                Navigator.of(context).pop();
+              }
+            },
+            child: const Text("Xác nhận", style: TextStyle( fontSize: 15, letterSpacing: 2.2, color: Colors.black)),
+          ),
+        ),
       ],
     );
   }

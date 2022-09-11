@@ -31,8 +31,8 @@ class Account {
     idAccount: json["IDAccount"],
     username: json["username"],
     password: json["password"],
-    hoTen: json["HoTen"] == null ? '' : json["HoTen"],
-    diaChi: json["DiaChi"] == null ? '' : json["DiaChi"],
+    hoTen: json["HoTenAccount"] ?? '',
+    diaChi: json["DiaChiAccount"] ?? '',
     sdt: json["SDT"],
     pictureLink: json["pictureLink"],
   );
@@ -41,8 +41,8 @@ class Account {
     "IDAccount": idAccount,
     "username": username,
     "password": password,
-    "HoTen": hoTen,
-    "DiaChi": diaChi,
+    "HoTenAccount": hoTen,
+    "DiaChiAccount": diaChi,
     "SDT": sdt,
     "pictureLink": pictureLink,
   };

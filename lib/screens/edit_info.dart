@@ -9,6 +9,8 @@ import 'dart:convert';
 
 const urlAPI = url;
 class EditProfilePage extends StatefulWidget {
+  const EditProfilePage({Key? key}) : super(key: key);
+
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
 }
@@ -128,7 +130,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           BoxShadow(spreadRadius: 2, blurRadius: 10, color: Colors.black.withOpacity(0.1), offset: Offset(0, 10))
                         ],
                         shape: BoxShape.circle,
-                      image: DecorationImage(
+                      image: const DecorationImage(
                         fit: BoxFit.cover,
                         image: NetworkImage('https://png.pngtree.com/png-clipart/20210608/ourlarge/pngtree-dark-gray-simple-avatar-png-image_3418404.jpg')
                       )
@@ -170,7 +172,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         children: [
           OutlinedButton(
             style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 50),
+                padding: const EdgeInsets.symmetric(horizontal: 40),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20)),
                 backgroundColor: Colors.lightGreen),
@@ -195,7 +197,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           ),
           OutlinedButton(
             style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 50),
+                padding: const EdgeInsets.symmetric(horizontal: 40),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20)),
                 backgroundColor: const Color(0xB9AEAEFF)),
@@ -248,14 +250,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         showPassword = !showPassword;
                       });
                     },
-                    icon: Icon(Icons.remove_red_eye, color: Colors.grey)
+                    icon: const Icon(Icons.remove_red_eye, color: Colors.grey)
                   )
                 : null,
-            contentPadding: EdgeInsets.only(bottom: 3),
+            contentPadding: const EdgeInsets.only(bottom: 3),
             labelText: labelText,
             floatingLabelBehavior: FloatingLabelBehavior.always
         ),
-        style: TextStyle(fontSize: 20),
+        style: const TextStyle(fontSize: 20),
       ),
     );
   }
@@ -280,14 +282,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     showPassword = !showPassword;
                   });
                 },
-                icon: Icon(Icons.remove_red_eye, color: Colors.grey)
+                icon: const Icon(Icons.remove_red_eye, color: Colors.grey)
             )
                 : null,
-            contentPadding: EdgeInsets.only(bottom: 3),
+            contentPadding: const EdgeInsets.only(bottom: 3),
             labelText: labelText,
             floatingLabelBehavior: FloatingLabelBehavior.always
         ),
-        style: TextStyle(fontSize: 20),
+        style: const TextStyle(fontSize: 20),
       ),
     );
   }
