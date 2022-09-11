@@ -5,26 +5,29 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:intl/intl.dart';
 
 
 const urlAPI = url;
 
-class OrderCancel extends StatefulWidget{
+class OrderAccept extends StatefulWidget{
   final int idDonHang;
-  OrderCancel({required this.idDonHang});
+  OrderAccept({required this.idDonHang});
 
   @override
-  OrderCancelState createState() => OrderCancelState();
+  OrderAcceptState createState() => OrderAcceptState();
 }
 
-class OrderCancelState extends State<OrderCancel>{
-  OrderCancelState();
+class OrderAcceptState extends State<OrderAccept>{
+  OrderAcceptState();
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   late Box box1;
   var updateState = false;
-  final _txtNote = TextEditingController();
+  var chosenDate;
+  final _txtNgayHen = TextEditingController();
+  final _txtBuoiHen = TextEditingController();
 
   static const TextStyle headerStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
   static const TextStyle contentStyle = TextStyle(fontSize: 20,);
@@ -38,33 +41,32 @@ class OrderCancelState extends State<OrderCancel>{
     });
   }
 
-  handleCancelConfirm() async{
+  handleAcceptConfirm() async{
     box1 = await Hive.openBox('logindata');
     final int IDNhanVien = box1.get("IDNhanVien");
     final url = Uri.http(urlAPI, 'api/MobileApp/cancelByNV/');
-    var jsonBody = {
-      'IDDonHang': widget.idDonHang,
-      'IDNhanVien': IDNhanVien,
-      'Note': _txtNote.text
-    };
-    String jsonStr = json.encode(jsonBody);
-    final resp = await http.delete(url, body: jsonStr, headers: {
-      // "Access-Control-Allow-Origin": "*",
-      // "Access-Control-Allow-Credentials": "true",
-      "Content-type": "application/json",
-      // "Accept": "application/json"
-    });
-    final response = resp.body;
-    return response;
+    // var jsonBody = {
+    //   'IDDonHang': widget.idDonHang,
+    //   'IDNhanVien': IDNhanVien,
+    //   'Note': _txtNote.text
+    // };
+    // String jsonStr = json.encode(jsonBody);
+    // final resp = await http.delete(url, body: jsonStr, headers: {
+    //   // "Access-Control-Allow-Origin": "*",
+    //   // "Access-Control-Allow-Credentials": "true",
+    //   "Content-type": "application/json",
+    //   // "Accept": "application/json"
+    // });
+    // final response = resp.body;
+    // return response;
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          title: const Padding(padding: EdgeInsets.only(left: 50), child: Text('Huỷ đơn hàng')),
+          title: const Padding(padding: EdgeInsets.only(left: 50), child: Text('Nhận đơn hàng')),
         ),
         body: GestureDetector(
           onTap: (){
@@ -74,18 +76,15 @@ class OrderCancelState extends State<OrderCancel>{
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              const Padding(
-                padding: EdgeInsets.all(5),
-                child: Text("Hãy ghi lí do huỷ đơn hàng:", style: headerStyle)
-              ),
+              buildDatePicker(),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: TextField(
-                  controller: _txtNote,
+                  controller: _txtBuoiHen,
                   style: const TextStyle(fontSize: 20),
                   decoration: const InputDecoration(
                       contentPadding: EdgeInsets.only(bottom: 3),
-                      labelText: "Lý do",
+                      labelText: "Buổi hẹn: ",
                       floatingLabelBehavior: FloatingLabelBehavior.always
                   ),
                 ),
@@ -102,6 +101,53 @@ class OrderCancelState extends State<OrderCancel>{
     );
   }
 
+  Row buildDatePicker() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(15),
+          width: 350,
+          child: TextField(
+              controller: _txtNgayHen,
+              decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    showDatePicker(
+                        context: context,
+                        initialDate: chosenDate ?? DateTime.now(),
+                        firstDate: DateTime(DateTime.now().year),
+                        lastDate: DateTime(DateTime.now().year+2)
+                    ).then((date) {
+                      if (date != null) {
+                        setState(() {
+                          chosenDate = date;
+                          String dateString = DateFormat('dd/MM/yyyy').format(date);
+                          // String dateString = '${date.day}/${date.month}/${date.year}';
+                          _txtNgayHen.text = dateString;
+                        });
+                      }
+                    });
+                  },
+                  icon: const Icon(Icons.calendar_month),
+                ),
+                hintText: 'Ngày hẹn: dd/mm/yyyy',
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: const BorderSide(color: Colors.red)),
+              ),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              onChanged: (value) {
+                setState(() {
+                  updateState = !updateState;
+                });
+              }),
+        ),
+      ],
+    );
+  }
+
   Row buildButton(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -114,7 +160,7 @@ class OrderCancelState extends State<OrderCancel>{
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 backgroundColor: Colors.purpleAccent),
             onPressed: () async{
-              String response = await handleCancelConfirm();
+              String response = await handleAcceptConfirm();
               ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(response, style: const TextStyle(fontSize: 20),))
               );

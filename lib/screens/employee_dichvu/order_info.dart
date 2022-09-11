@@ -1,5 +1,6 @@
 import 'package:MobileApp_LVTN/constants.dart';
 import 'package:MobileApp_LVTN/models/donhang.dart';
+import 'package:MobileApp_LVTN/screens/employee_dichvu/order_accept.dart';
 import 'package:MobileApp_LVTN/screens/employee_dichvu/order_cancel.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -216,6 +217,8 @@ class OrderInfoState extends State<OrderInfo>{
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 backgroundColor: Colors.lightGreen),
             onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => OrderAccept(idDonHang: widget.idDonHang)));
             },
             child: const Text("Nhận đơn hàng", style: TextStyle( fontSize: 15, letterSpacing: 2.2, color: Colors.black)),
           ),
