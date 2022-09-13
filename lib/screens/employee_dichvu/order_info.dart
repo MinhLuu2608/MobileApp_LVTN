@@ -1,7 +1,9 @@
 import 'package:MobileApp_LVTN/constants.dart';
+import 'package:MobileApp_LVTN/models/chitiet_dichvu.dart';
 import 'package:MobileApp_LVTN/models/donhang.dart';
 import 'package:MobileApp_LVTN/screens/employee_dichvu/order_accept.dart';
 import 'package:MobileApp_LVTN/screens/employee_dichvu/order_cancel.dart';
+import 'package:MobileApp_LVTN/screens/employee_dichvu/order_edit_and_complete.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -55,7 +57,7 @@ class OrderInfoState extends State<OrderInfo>{
       "Content-type": "application/json",
       // "Accept": "application/json"
     });
-    final response = json.decode(resp.body);
+    final response = chiTietDichVuFromJson(resp.body);
     return response;
   }
 
@@ -72,67 +74,73 @@ class OrderInfoState extends State<OrderInfo>{
       appBar: AppBar(
         title: const Padding(padding: EdgeInsets.only(left: 50), child: Text('Chi tiết hoá đơn')),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          FutureBuilder(
-            future: getHoaDon(),
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (snapshot.connectionState != ConnectionState.done) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (snapshot.hasError) {
-                return const Text("Something Wrong");
-              }
-              if (snapshot.hasData) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    buildOrderInfo(snapshot),
-                    const Padding(
-                        padding: EdgeInsets.all(5),
-                        child: Text("Danh sách dịch vụ", style: headerStyle)
-                    ),
-                    Padding(
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            FutureBuilder(
+              future: getHoaDon(),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState != ConnectionState.done) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return const Text("Something Wrong");
+                }
+                if (snapshot.hasData) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      buildOrderInfo(snapshot),
+                      const Padding(
+                          padding: EdgeInsets.all(5),
+                          child: Text("Danh sách dịch vụ", style: headerStyle)
+                      ),
+                      Padding(
                         padding: const EdgeInsets.all(5),
-                        child: FutureBuilder(
-                          future: getServiceList(),
-                          builder: (BuildContext context, AsyncSnapshot snapshot2) {
-                            if (snapshot2.connectionState != ConnectionState.done) {
-                              return const Center(child: CircularProgressIndicator());
-                            }
-                            if (snapshot2.hasError) {
-                              return const Text("Something Wrong");
-                            }
-                            if (snapshot2.hasData) {
-                              return ListView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: snapshot2.data.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return buildTableRow(context, snapshot2, index);
-                                },
-                              );
-                            }
-                            return const Text("Error while Calling API");
-                          },
-                        )
-                    ), //Dịch vụ list
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        if (snapshot.data[0].tinhTrangXuLy == 'Chờ xử lý') buildButtonChoXuLy(context),
-                        if (snapshot.data[0].tinhTrangXuLy == 'Đã tiếp nhận') buildButtonChoXuLy(context),
-                      ],
-                    )
-                  ],
-                );
-              }
-              return const Text("Error while Calling API");
-            },
-          ),
-        ],
+                        child: buildTableHeader(context),
+                      ),
+                      Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: FutureBuilder(
+                            future: getServiceList(),
+                            builder: (BuildContext context, AsyncSnapshot snapshot2) {
+                              if (snapshot2.connectionState != ConnectionState.done) {
+                                return const Center(child: CircularProgressIndicator());
+                              }
+                              if (snapshot2.hasError) {
+                                return const Text("Something Wrong");
+                              }
+                              if (snapshot2.hasData) {
+                                return ListView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: snapshot2.data.length,
+                                  itemBuilder: (BuildContext context, int index) {
+                                    return buildTableRow(context, snapshot2, index);
+                                  },
+                                );
+                              }
+                              return const Text("Error while Calling API");
+                            },
+                          )
+                      ), //Dịch vụ list
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          if (snapshot.data[0].tinhTrangXuLy == 'Chờ xử lý') buildButtonChoXuLy(context),
+                          if (snapshot.data[0].tinhTrangXuLy == 'Đã tiếp nhận') buildButtonDaTiepNhan(context),
+                        ],
+                      )
+                    ],
+                  );
+                }
+                return const Text("Error while Calling API");
+              },
+            ),
+          ],
+        ),
       )
     );
   }
@@ -205,6 +213,50 @@ class OrderInfoState extends State<OrderInfo>{
     );
   }
 
+  Row buildButtonDaTiepNhan(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20.0),
+          child: OutlinedButton(
+            style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                backgroundColor: Colors.lightGreen),
+            onPressed: () async {
+              List<DonHang> donHangList = await getHoaDon();
+              DonHang donHang = donHangList[0];
+              List<ChiTietDichVu> dichVuList = await getServiceList();
+              final response = await Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => OrderEditAndComplete(donHang: donHang, dichVuList: dichVuList)));
+              if(response == null){
+                setState(() {
+                  updateState = !updateState;
+                });
+              }
+            },
+            child: const Text("Chỉnh sửa và hoàn thành", style: TextStyle( fontSize: 15, letterSpacing: 1.0, color: Colors.black)),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20.0, left: 10.0),
+          child: OutlinedButton(
+            style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                backgroundColor: Colors.purpleAccent),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => OrderCancel(idDonHang: widget.idDonHang)));
+            },
+            child: const Text("Huỷ đơn hàng", style: TextStyle( fontSize: 15, letterSpacing: 1.5, color: Colors.black)),
+          ),
+        ),
+      ],
+    );
+  }
+
   Row buildButtonChoXuLy(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -216,9 +268,14 @@ class OrderInfoState extends State<OrderInfo>{
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 backgroundColor: Colors.lightGreen),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
+            onPressed: () async {
+              final response = await Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => OrderAccept(idDonHang: widget.idDonHang)));
+              if(response == null){
+                setState(() {
+                  updateState = !updateState;
+                });
+              }
             },
             child: const Text("Nhận đơn hàng", style: TextStyle( fontSize: 15, letterSpacing: 2.2, color: Colors.black)),
           ),
@@ -250,23 +307,23 @@ class OrderInfoState extends State<OrderInfo>{
           Container(
             padding: const EdgeInsets.only(right: 5.0),
             width: MediaQuery.of(context).size.width * 0.29,
-            child: Center(child: Text(snapshot.data[index]['TenDichVu'], style: tableRowStyle)),
+            child: Center(child: Text(snapshot.data[index].tenDichVu, style: tableRowStyle)),
           ),
           Container(
             padding: const EdgeInsets.only(right: 5.0),
             width: MediaQuery.of(context).size.width * 0.20,
-            child: Center(child: Text(snapshot.data[index]['SoLuong'].toString(), style: tableRowStyle),
+            child: Center(child: Text(snapshot.data[index].soLuong.toString(), style: tableRowStyle),
             ),
           ),
           Container(
             padding: const EdgeInsets.only(right: 5.0),
             width: MediaQuery.of(context).size.width * 0.20,
-            child: Center(child: Text(snapshot.data[index]['DonGia'].toString(), style: tableRowStyle)),
+            child: Center(child: Text(snapshot.data[index].donGia.toString(), style: tableRowStyle)),
           ),
           Container(
             padding: const EdgeInsets.only(right: 5.0),
             width: MediaQuery.of(context).size.width * 0.20,
-            child: Center(child: Text(snapshot.data[index]['TongTienDV'].toString(), style: tableRowStyle)),
+            child: Center(child: Text(snapshot.data[index].tongTienDv.toString(), style: tableRowStyle)),
           ),
         ],
       ),

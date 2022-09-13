@@ -1,12 +1,12 @@
 // To parse this JSON data, do
 //
-//     final dichVu = dichVuFromJson(jsonString);
+//     final chiTietDichVu = chiTietDichVuFromJson(jsonString);
 
 import 'dart:convert';
 
-List<ChiTietDichVu> dichVuFromJson(String str) => List<ChiTietDichVu>.from(json.decode(str).map((x) => ChiTietDichVu.fromJson(x)));
+List<ChiTietDichVu> chiTietDichVuFromJson(String str) => List<ChiTietDichVu>.from(json.decode(str).map((x) => ChiTietDichVu.fromJson(x)));
 
-String dichVuToJson(List<ChiTietDichVu> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String chiTietDichVuToJson(List<ChiTietDichVu> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class ChiTietDichVu {
   ChiTietDichVu({

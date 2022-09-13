@@ -139,6 +139,7 @@ class OrderFilterListState extends State<OrderFilterList> {
                       child:
                           Text("Số điện thoại: ${snapshot.data[index].soDienThoaiKh}", style: styleContent),
                     ), //SDT
+
                     Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: (buildTextTinhTrangXuLy(snapshot, index))
@@ -163,10 +164,20 @@ class OrderFilterListState extends State<OrderFilterList> {
       );
     }
     if(snapshot.data[index].tinhTrangXuLy == "Đã tiếp nhận"){
-      return Row(
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Tình trạng xử lý: ", style: TextStyle(fontSize: 20,)),
-          Text(snapshot.data[index].tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.blue)),
+          Row(
+            children: [
+              const Text("Tình trạng xử lý: ", style: TextStyle(fontSize: 20,)),
+              Text(snapshot.data[index].tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.blue)),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: Text("Ngày hẹn: ${snapshot.data[index].ngayHen} ${snapshot.data[index].buoiHen}", style: TextStyle(fontSize: 20),),
+          )
         ],
       );
     }
