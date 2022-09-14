@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import 'package:MobileApp_LVTN/models/chitiet_dichvu.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive/hive.dart';
 
 
 const urlAPI = url;
@@ -26,7 +28,7 @@ class OrderEditAndCompleteState extends State<OrderEditAndComplete>{
   void initState() {
     // TODO: implement initState
     super.initState();
-    _txtHoTen.text = widget.donHang.hoTen;
+    _txtHoTen.text = widget.donHang.tenKhachHang;
     _txtDiaChi.text = widget.donHang.diaChiKh;
     _txtSDT.text = widget.donHang.soDienThoaiKh;
   }
@@ -37,7 +39,10 @@ class OrderEditAndCompleteState extends State<OrderEditAndComplete>{
   final _txtHoTen = TextEditingController();
   final _txtSDT = TextEditingController();
   final _txtDiaChi = TextEditingController();
-  final _txtTongTienDH = TextEditingController();
+  final _password = TextEditingController();
+  bool _showpass = true;
+
+  late Box box1;
 
   List<String> buoiHen = ["Sáng", "Chiều"];
 
@@ -73,6 +78,11 @@ class OrderEditAndCompleteState extends State<OrderEditAndComplete>{
     if(_txtSDT.text.length != 10){
       return 'Số điện thoại phải có 10 chữ số';
     }
+    for(var i=0;i<widget.dichVuList.length;i++){
+      if(widget.dichVuList[i].soLuong <= 0){
+        return 'Số lượng dịch vụ phải lớn hơn 0';
+      }
+    }
     return "OK";
   }
 
@@ -85,23 +95,44 @@ class OrderEditAndCompleteState extends State<OrderEditAndComplete>{
 
   }
 
+  Future<String> handleCheckPass() async{
+    final url = Uri.http(urlAPI, 'api/MobileApp/checkRepass');
+    box1 = await Hive.openBox('logindata');
+    final int IDAccount = box1.get("IDAccount");
+    var jsonBody = {
+      'IDAccount': IDAccount,
+      'Password': _password.text
+    };
+    String jsonStr = json.encode(jsonBody);
+    final resp = await http.post(url, body: jsonStr, headers: {
+      // "Access-Control-Allow-Origin": "*",
+      // "Access-Control-Allow-Credentials": "true",
+      "Content-type": "application/json",
+      // "Accept": "application/json"
+    });
+    final response = resp.body;
+    return response;
+  }
+
   handleCompleteConfirm() async{
-    final url = Uri.http(urlAPI, 'api/MobileApp/acceptOrder/');
-    // var jsonBody = {
-    //   'IDDonHang': widget.idDonHang,
-    //   'IDNhanVien': IDNhanVien,
-    //   'NgayHen': dateString,
-    //   'BuoiHen': valueBuoiHen
-    // };
-    // String jsonStr = json.encode(jsonBody);
-    // final resp = await http.post(url, body: jsonStr, headers: {
-    //   // "Access-Control-Allow-Origin": "*",
-    //   // "Access-Control-Allow-Credentials": "true",
-    //   "Content-type": "application/json",
-    //   // "Accept": "application/json"
-    // });
-    // final response = resp.body;
-    // return response;
+    final url = Uri.http(urlAPI, 'api/MobileApp/doneOrder/');
+    var jsonBody = {
+      'IDDonHang': widget.donHang.idDonHang,
+      'TenKhachHang': _txtHoTen.text,
+      'DiaChiKH': _txtDiaChi.text,
+      'SoDienThoaiKH': _txtSDT.text,
+      'TongTienDH': widget.donHang.tongTienDh,
+      'DichVuList': widget.dichVuList
+    };
+    String jsonStr = json.encode(jsonBody);
+    final resp = await http.put(url, body: jsonStr, headers: {
+      // "Access-Control-Allow-Origin": "*",
+      // "Access-Control-Allow-Credentials": "true",
+      "Content-type": "application/json",
+      // "Accept": "application/json"
+    });
+    final response = resp.body;
+    return response;
   }
 
   handleEditConfirm() async{
@@ -111,18 +142,18 @@ class OrderEditAndCompleteState extends State<OrderEditAndComplete>{
       'TenKhachHang': _txtHoTen.text,
       'DiaChiKH': _txtDiaChi.text,
       'SoDienThoaiKH': _txtSDT.text,
-      'TongTienDH': _txtTongTienDH.text,
-      'DichVuList': ''
+      'TongTienDH': widget.donHang.tongTienDh,
+      'DichVuList': widget.dichVuList
     };
-    // String jsonStr = json.encode(jsonBody);
-    // final resp = await http.put(url, body: jsonStr, headers: {
-    //   // "Access-Control-Allow-Origin": "*",
-    //   // "Access-Control-Allow-Credentials": "true",
-    //   "Content-type": "application/json",
-    //   // "Accept": "application/json"
-    // });
-    // final response = resp.body;
-    // return response;
+    String jsonStr = json.encode(jsonBody);
+    final resp = await http.put(url, body: jsonStr, headers: {
+      // "Access-Control-Allow-Origin": "*",
+      // "Access-Control-Allow-Credentials": "true",
+      "Content-type": "application/json",
+      // "Accept": "application/json"
+    });
+    final response = resp.body;
+    return response;
   }
 
   @override
@@ -177,7 +208,7 @@ class OrderEditAndCompleteState extends State<OrderEditAndComplete>{
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text("Tổng tiền: ", style: headerStyle),
-              Text(widget.donHang.tongTienDh.toString()),
+              Text("${widget.donHang.tongTienDh.toString()}đ", style: contentStyle),
             ],
           ),
         ),
@@ -250,7 +281,6 @@ class OrderEditAndCompleteState extends State<OrderEditAndComplete>{
                         TextButton(
                             onPressed: () {
                               updateAmount(index, int.parse(_value.text));
-                              print(widget.dichVuList[index].soLuong);
                               this.setState(() {
                                 updateState = !updateState;
                               });
@@ -318,7 +348,70 @@ class OrderEditAndCompleteState extends State<OrderEditAndComplete>{
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 backgroundColor: Colors.lightGreen),
             onPressed: () async {
-
+              await showDialog(context: context,builder: (context) {
+                return StatefulBuilder(builder: (context, setState) {
+                  return AlertDialog(
+                    title: const Center(child: Text("Xác nhận hoàn thành")),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          controller: _password,
+                          obscureText: _showpass,
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.only(bottom: 3),
+                            labelText: "Nhập lại mật khẩu:",
+                            floatingLabelBehavior: FloatingLabelBehavior.always,
+                            suffixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _showpass = !_showpass;
+                                  });
+                                },
+                                icon: Icon(_showpass ? Icons.visibility : Icons.visibility_off, color: Colors.grey)
+                            )
+                          ),
+                          style: const TextStyle(fontSize: 20),
+                        )
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                          onPressed: () async {
+                            String validString = checkValid();
+                            if(validString != "OK") {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(validString, style: const TextStyle(fontSize: 20),))
+                              );
+                            }
+                            else{
+                              String checkResponse = await handleCheckPass();
+                              if(checkResponse != "\"OK\"") {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(checkResponse, style: const TextStyle(fontSize: 20)))
+                                );
+                              }
+                              else{
+                                final response = await handleCompleteConfirm();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(response, style: const TextStyle(fontSize: 20)))
+                                );
+                                Navigator.of(context).pop();
+                                Navigator.of(context).pop();
+                              }
+                            }
+                          },
+                          child: const Text("Xác nhận", style: TextStyle(fontSize: 20))),
+                      TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text("Huỷ bỏ", style: TextStyle(fontSize: 20)))
+                    ],
+                  );
+                });
+              }
+              );
             },
             child: const Text("Hoàn thành", style: TextStyle( fontSize: 15, letterSpacing: 2.2, color: Colors.black)),
           ),
@@ -330,8 +423,20 @@ class OrderEditAndCompleteState extends State<OrderEditAndComplete>{
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 backgroundColor: Colors.amberAccent),
-            onPressed: () {
-
+            onPressed: () async{
+              String validString = checkValid();
+              if(validString != "OK") {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(validString, style: const TextStyle(fontSize: 20),))
+                );
+              }
+              else{
+                final response = await handleEditConfirm();
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(response, style: const TextStyle(fontSize: 20)))
+                );
+                Navigator.of(context).pop();
+              }
             },
             child: const Text("Chỉnh sửa", style: TextStyle( fontSize: 15, letterSpacing: 2.2, color: Colors.black)),
           ),

@@ -129,11 +129,11 @@ Future<Uint8List> buildPdf(PdfPageFormat pageFormat, EmpInvoice empInvoice) asyn
 pw.PageTheme _buildTheme(
     PdfPageFormat pageFormat, pw.Font base, pw.Font bold, pw.Font italic) {
   return pw.PageTheme(
-    pageFormat: pageFormat,
-    theme: pw.ThemeData.withFont(
-      base: base,
-      bold: bold,
-      italic: italic,
-    )
+      pageFormat: pageFormat,
+      theme: pw.ThemeData.withFont(
+        base: base,
+        bold: bold,
+        italic: italic,
+      )
   );
 }

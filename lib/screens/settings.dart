@@ -1,3 +1,4 @@
+import 'package:MobileApp_LVTN/screens/change_pass.dart';
 import 'package:MobileApp_LVTN/screens/edit_info.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,10 @@ class _SettingsPageState extends State<SettingsPage> {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) => EditProfilePage()));
   }
 
+  goToChangePassPage(){
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChangePass()));
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +53,7 @@ class _SettingsPageState extends State<SettingsPage> {
             const Divider(height: 15, thickness: 2),
             const SizedBox(height: 10),
             buildOptionWithEvent(context, "Thông tin cá nhân", goToInfoPage),
-            buildAccountOptionRow(context, "Đổi mật khẩu"),
+            buildOptionWithEvent(context, "Đổi mật khẩu", goToChangePassPage),
             buildAccountOptionRow(context, "Ngôn ngữ"),
             buildAccountOptionRow(context, "Bảo mật"),
             const SizedBox(height: 30),
@@ -105,8 +110,7 @@ class _SettingsPageState extends State<SettingsPage> {
   GestureDetector buildOptionWithEvent(BuildContext context, String title, Function handleChangePage) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => EditProfilePage()));
+        handleChangePage();
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),

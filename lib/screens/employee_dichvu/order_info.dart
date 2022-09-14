@@ -4,12 +4,11 @@ import 'package:MobileApp_LVTN/models/donhang.dart';
 import 'package:MobileApp_LVTN/screens/employee_dichvu/order_accept.dart';
 import 'package:MobileApp_LVTN/screens/employee_dichvu/order_cancel.dart';
 import 'package:MobileApp_LVTN/screens/employee_dichvu/order_edit_and_complete.dart';
+import 'package:MobileApp_LVTN/screens/employee_dichvu/preview_print_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
 
 final urlAPI = url;
 
@@ -28,7 +27,6 @@ class OrderInfoState extends State<OrderInfo>{
 
   late Box box1;
 
-  var dichVuList;
   var updateState = false;
 
   static const TextStyle headerStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
@@ -126,11 +124,22 @@ class OrderInfoState extends State<OrderInfo>{
                             },
                           )
                       ), //Dịch vụ list
+                      Padding(
+                        padding: const EdgeInsets.only(right: 50, bottom: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            const Text("Tổng tiền: ", style: headerStyle),
+                            Text("${snapshot.data[0].tongTienDh.toString()}đ", style: contentStyle),
+                          ],
+                        ),
+                      ),
                       Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           if (snapshot.data[0].tinhTrangXuLy == 'Chờ xử lý') buildButtonChoXuLy(context),
                           if (snapshot.data[0].tinhTrangXuLy == 'Đã tiếp nhận') buildButtonDaTiepNhan(context),
+                          if (snapshot.data[0].tinhTrangXuLy == 'Đã hoàn thành') buildButtonDaHoanThanh(context),
                         ],
                       )
                     ],
@@ -209,6 +218,36 @@ class OrderInfoState extends State<OrderInfo>{
             ],
           ),
         ), // Ngày thu
+      ],
+    );
+  }
+
+  Row buildButtonDaHoanThanh(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20.0),
+          child: OutlinedButton(
+            style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 50),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                backgroundColor: Colors.lightGreen),
+            onPressed: () async {
+              List<DonHang> donHangList = await getHoaDon();
+              DonHang donHang = donHangList[0];
+              List<ChiTietDichVu> dichVuList = await getServiceList();
+              final response = await Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => PreviewScreenOrder(donHang: donHang, dichVuList: dichVuList)));
+              if(response == null){
+                setState(() {
+                  updateState = !updateState;
+                });
+              }
+            },
+            child: const Text("In đơn hàng", style: TextStyle( fontSize: 16, letterSpacing: 2.2, color: Colors.black)),
+          ),
+        )
       ],
     );
   }

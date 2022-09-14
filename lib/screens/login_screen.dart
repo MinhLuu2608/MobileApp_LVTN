@@ -11,15 +11,14 @@ class LoginPage extends StatefulWidget{
   const LoginPage({Key? key}) : super(key: key);
 
   @override
-  LoginScreen createState() => LoginScreen();
+  LoginPageState createState() => LoginPageState();
 }
 
-class LoginScreen extends State<LoginPage> {
+class LoginPageState extends State<LoginPage> {
 
   var txtUsername = TextEditingController();
   var txtPassword = TextEditingController();
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final formKey = GlobalKey<FormState>();
 
   bool isChecked = false;
@@ -58,7 +57,6 @@ class LoginScreen extends State<LoginPage> {
     // TODO: implement build
     final size = MediaQuery.of(context).size;
     return Scaffold(
-      key: _scaffoldKey,
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -220,7 +218,7 @@ class LoginScreen extends State<LoginPage> {
                             const snackBar = SnackBar(content:
                               Text("Username hoặc password không hợp lệ", style: TextStyle(fontSize: 20))
                             );
-                            _scaffoldKey.currentState!.showSnackBar(snackBar);
+                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
                           }
                           else{
                             if( await checkLogin(txtUsername.text, txtPassword.text) ){
@@ -228,7 +226,7 @@ class LoginScreen extends State<LoginPage> {
                               await setIDAccount(txtUsername.text, txtPassword.text);
                               await setIDNhanVien();
                               const snackBar = SnackBar(content: Text("Đăng nhập thành công", style: TextStyle(fontSize: 20)));
-                              _scaffoldKey.currentState!.showSnackBar(snackBar);
+                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
                               // print("IDAccount : ${box1.get("IDAccount").toString()}");
                               // print("IDNhanVien: ${box1.get("IDNhanVien").toString()}");
                               if(box1.get("IDNhanVien") == -1){
@@ -241,7 +239,7 @@ class LoginScreen extends State<LoginPage> {
                             }
                             else{
                               const snackBar = SnackBar(content: Text("Đăng nhập thất bại", style: TextStyle(fontSize: 20)));
-                              _scaffoldKey.currentState!.showSnackBar(snackBar);
+                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
                             }
                           }
                         },

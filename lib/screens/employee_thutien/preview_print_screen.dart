@@ -1,12 +1,10 @@
 import 'package:MobileApp_LVTN/screens/employee_thutien/pdf.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:MobileApp_LVTN/models/emp_invoice.dart';
 
 class PreviewScreen extends StatelessWidget {
-  var doc = pw.Document();
   EmpInvoice empInvoice;
 
    PreviewScreen({Key? key, required this.empInvoice}) : super(key: key);

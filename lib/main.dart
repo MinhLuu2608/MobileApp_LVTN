@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget{
       debugShowCheckedModeBanner: false,
       title: "Material App",
       routes: {
-        'login' : (_) => LoginPage(),
+        'login' : (_) => const LoginPage(),
         'register' : (_) => RegisterScreen(),
         'customer/home' : (_) => HomeScreen(),
         'employee_thutien/home' : (_) => EmpThuTienHomeScreen(),
