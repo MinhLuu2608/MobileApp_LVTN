@@ -101,11 +101,14 @@ class InvoiceListState extends State<InvoiceList> {
     return Padding(
       padding: const EdgeInsets.all(3),
       child: InkWell(
-        onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => InvoiceInfo(
-                idHoaDon: snapshot.data[index].idHoaDon,
-              )));
+        onTap: () async{
+          final response = await Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => InvoiceInfo(idHoaDon: snapshot.data[index].idHoaDon)));
+          if(response == null){
+            setState(() {
+              updateState = !updateState;
+            });
+          }
         },
         child: Card(
           shape:

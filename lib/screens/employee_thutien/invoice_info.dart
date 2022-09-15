@@ -1,39 +1,55 @@
 import 'package:MobileApp_LVTN/constants.dart';
 import 'package:MobileApp_LVTN/models/emp_invoice.dart';
-import 'package:MobileApp_LVTN/models/invoice.dart';
 import 'package:MobileApp_LVTN/screens/employee_thutien/preview_print_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive/hive.dart';
 
-
-final urlAPI = url;
+const urlAPI = url;
 
 class InvoiceInfo extends StatefulWidget{
   final int idHoaDon;
   const InvoiceInfo({Key? key, required this.idHoaDon}) : super(key: key);
   @override
-  InvoiceInfoState createState() => InvoiceInfoState(idHoaDon: idHoaDon);
+  InvoiceInfoState createState() => InvoiceInfoState();
 }
 
 class InvoiceInfoState extends State<InvoiceInfo>{
-  final int idHoaDon;
-  InvoiceInfoState({required this.idHoaDon});
-
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   var updateState = false;
   var hinhThucThanhToan = "";
+  final _password = TextEditingController();
+  bool _showpass = true;
+
+  late Box box1;
 
   static const TextStyle headerStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
   static const TextStyle contentStyle = TextStyle(fontSize: 20,);
   static const TextStyle chuaThuStyle = TextStyle(fontSize: 20, color: Colors.pink);
 
+  Future<String> handleCheckPass() async{
+    final url = Uri.http(urlAPI, 'api/MobileApp/checkRepass');
+    box1 = await Hive.openBox('logindata');
+    final int IDAccount = box1.get("IDAccount");
+    var jsonBody = {
+      'IDAccount': IDAccount,
+      'Password': _password.text
+    };
+    String jsonStr = json.encode(jsonBody);
+    final resp = await http.post(url, body: jsonStr, headers: {
+      // "Access-Control-Allow-Origin": "*",
+      // "Access-Control-Allow-Credentials": "true",
+      "Content-type": "application/json",
+      // "Accept": "application/json"
+    });
+    final response = resp.body;
+    return response;
+  }
+
   Future<List<EmpInvoice>> getHoaDonInfo() async {
-    final url = Uri.http(urlAPI, 'api/MobileApp/empHoaDonInfo/$idHoaDon');
+    final url = Uri.http(urlAPI, 'api/MobileApp/empHoaDonInfo/${widget.idHoaDon}');
 
     final resp = await http.get(url, headers: {
       // "Access-Control-Allow-Origin": "*",
@@ -42,7 +58,7 @@ class InvoiceInfoState extends State<InvoiceInfo>{
       // "Accept": "application/json"
     });
     final response = empInvoiceFromJson(resp.body);
-    hinhThucThanhToan = await getHinhThucThanhToan(idHoaDon);
+    hinhThucThanhToan = await getHinhThucThanhToan(widget.idHoaDon);
     return response;
   }
 
@@ -55,7 +71,6 @@ class InvoiceInfoState extends State<InvoiceInfo>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       appBar: AppBar(
         title: const Padding(padding: EdgeInsets.only(left: 50), child: Text('Chi tiết hoá đơn')),
       ),
@@ -63,10 +78,10 @@ class InvoiceInfoState extends State<InvoiceInfo>{
         future: getHoaDonInfo(),
         builder: (BuildContext context, AsyncSnapshot snapshot){
           if(snapshot.connectionState != ConnectionState.done){
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           if(snapshot.hasError){
-            return Text("Something Wrong");
+            return const Text("Something Wrong");
           }
           if(snapshot.hasData){
             return Column(
@@ -89,7 +104,7 @@ class InvoiceInfoState extends State<InvoiceInfo>{
                         style: headerStyle,
                       ),
                       const SizedBox(width: 5),
-                      Text(snapshot.data[0].maSoPhieu, style: contentStyle),
+                      Text(snapshot.data[0].maSoHoaDon, style: contentStyle),
                     ],
                   ),
                 ), // Mã số phiếu
@@ -154,7 +169,7 @@ class InvoiceInfoState extends State<InvoiceInfo>{
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text("Ngày thu:", style: headerStyle),
+                      const Text("Ngày thu:", style: headerStyle),
                       const SizedBox(width: 5),
                       snapshot.data[0].ngayThu == "Chưa thu"
                           ? Text(snapshot.data[0].ngayThu, style: chuaThuStyle)
@@ -167,9 +182,9 @@ class InvoiceInfoState extends State<InvoiceInfo>{
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text("Giá:", style: headerStyle),
+                      const Text("Giá:", style: headerStyle),
                       const SizedBox(width: 5),
-                      Text(snapshot.data[0].gia.toString() + "đ", style: contentStyle),
+                      Text("${snapshot.data[0].gia}đ", style: contentStyle),
                     ],
                   ),
                 ), // Giá
@@ -187,25 +202,74 @@ class InvoiceInfoState extends State<InvoiceInfo>{
                                     borderRadius: BorderRadius.circular(20),
                                   )),
                               onPressed: () async {
-                                if (await checkAbleToPay(
-                                    snapshot.data[0].idHoaDon)) {
-                                  var response = await handleConfirm(
-                                      idHoaDon: snapshot.data[0].idHoaDon,
-                                      idNhanVien: snapshot.data[0].idNhanVien,
-                                      idTuyenThu: snapshot.data[0].idTuyenThu
-                                  );
-                                  showDialog(
-                                      context: context,
-                                      builder: (_) => buildAlertDialogSuccess(response));
-                                  setState(() {
-                                    updateState = !updateState;
+                                await showDialog(context: context,builder: (context) {
+                                  return StatefulBuilder(builder: (context, setState) {
+                                    return AlertDialog(
+                                      title: const Center(child: Text("Xác nhận hoàn thành")),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          TextField(
+                                            controller: _password,
+                                            obscureText: _showpass,
+                                            decoration: InputDecoration(
+                                                contentPadding: const EdgeInsets.only(bottom: 3),
+                                                labelText: "Nhập lại mật khẩu:",
+                                                floatingLabelBehavior: FloatingLabelBehavior.always,
+                                                suffixIcon: IconButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        _showpass = !_showpass;
+                                                      });
+                                                    },
+                                                    icon: Icon(_showpass ? Icons.visibility : Icons.visibility_off, color: Colors.grey)
+                                                )
+                                            ),
+                                            style: const TextStyle(fontSize: 20),
+                                          )
+                                        ],
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () async {
+                                            String checkResponse = await handleCheckPass();
+                                            if(checkResponse != "\"OK\"") {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(content: Text(checkResponse, style: const TextStyle(fontSize: 20)))
+                                              );
+                                            }
+                                            else{
+                                              if (await checkAbleToPay(snapshot.data[0].idHoaDon)) {
+                                                var response = await handleConfirm(
+                                                  idHoaDon: snapshot.data[0].idHoaDon,
+                                                  idNhanVien: snapshot.data[0].idNhanVien,
+                                                  idTuyenThu: snapshot.data[0].idTuyenThu
+                                                );
+                                                Navigator.of(context).pop();
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (_) => buildAlertDialogSuccess(response));
+                                              }
+                                              else {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (_) => buildAlertDialogWarning());
+                                              }
+                                            }
+                                          },
+                                          child: const Text("Xác nhận", style: TextStyle(fontSize: 20))),
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text("Huỷ bỏ", style: TextStyle(fontSize: 20)))
+                                      ],
+                                    );
                                   });
-                                }
-                                else {
-                                  showDialog(
-                                      context: context,
-                                      builder: (_) => buildAlertDialogWarning());
-                                }
+                                });
+                                setState(() {
+                                  updateState = !updateState;
+                                });
                               },
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -219,38 +283,42 @@ class InvoiceInfoState extends State<InvoiceInfo>{
                           ],
                         ),
                       )
-                    : Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Hình thức thanh toán: ", style: headerStyle),
-                                Text(hinhThucThanhToan, style: contentStyle)
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                buildInHoaDonButton(snapshot),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
+                    : buildDaThuButton(snapshot)
               ],
             );
           }
-          return Text("Error while Calling API");
+          return const Text("Error while Calling API");
         },
+      ),
+    );
+  }
+
+  Expanded buildDaThuButton(AsyncSnapshot<dynamic> snapshot) {
+    return Expanded(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("Hình thức thanh toán: ", style: headerStyle),
+                Flexible(child: Text(hinhThucThanhToan, style: contentStyle))
+              ],
+            ),
+          ),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                buildInHoaDonButton(snapshot),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -279,7 +347,7 @@ class InvoiceInfoState extends State<InvoiceInfo>{
         ),
         const SizedBox(height: 20)
       ],
-                      );
+    );
   }
 
   AlertDialog buildAlertDialogWarning() {
@@ -310,7 +378,7 @@ class InvoiceInfoState extends State<InvoiceInfo>{
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Icon(Icons.check_circle_outline, color: Colors.green),
-              Flexible(child: Text(response, style: TextStyle(fontSize: 18)))
+              Flexible(child: Text(response, style: const TextStyle(fontSize: 18)))
             ],
           ),
         ],
@@ -362,7 +430,7 @@ class InvoiceInfoState extends State<InvoiceInfo>{
       "Content-type": "application/json",
       // "Accept": "application/json"
     });
-    final response = resp.body;
+    final response = json.decode(resp.body);
     return response;
   }
 

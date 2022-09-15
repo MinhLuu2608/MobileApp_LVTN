@@ -11,7 +11,7 @@ String empInvoiceToJson(List<EmpInvoice> data) => json.encode(List<dynamic>.from
 class EmpInvoice {
   EmpInvoice({
     required this.idHoaDon,
-    required this.maSoPhieu,
+    required this.maSoHoaDon,
     required this.ngayTao,
     required this.ngayThu,
     required this.tenKyThu,
@@ -29,7 +29,7 @@ class EmpInvoice {
   });
 
   int idHoaDon;
-  String maSoPhieu;
+  String maSoHoaDon;
   String ngayTao;
   String ngayThu;
   String tenKyThu;
@@ -47,7 +47,7 @@ class EmpInvoice {
 
   factory EmpInvoice.fromJson(Map<String, dynamic> json) => EmpInvoice(
     idHoaDon: json["IDHoaDon"],
-    maSoPhieu: json["MaSoPhieu"],
+    maSoHoaDon: json["MaSoHoaDon"],
     ngayTao: json["NgayTao"],
     ngayThu: json["NgayThu"] == null ? "Chưa thu" : json["NgayThu"],
     tenKyThu: json["TenKyThu"],
@@ -66,7 +66,7 @@ class EmpInvoice {
 
   Map<String, dynamic> toJson() => {
     "IDHoaDon": idHoaDon,
-    "MaSoPhieu": maSoPhieu,
+    "MaSoHoaDon": maSoHoaDon,
     "NgayTao": ngayTao,
     "NgayThu": ngayThu == null ? null : ngayThu,
     "TenKyThu": tenKyThu,

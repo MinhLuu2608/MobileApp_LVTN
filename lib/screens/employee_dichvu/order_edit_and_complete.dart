@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:MobileApp_LVTN/models/chitiet_dichvu.dart';
 import 'dart:convert';
-import 'package:intl/intl.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
 
@@ -410,8 +409,7 @@ class OrderEditAndCompleteState extends State<OrderEditAndComplete>{
                     ],
                   );
                 });
-              }
-              );
+              });
             },
             child: const Text("Hoàn thành", style: TextStyle( fontSize: 15, letterSpacing: 2.2, color: Colors.black)),
           ),

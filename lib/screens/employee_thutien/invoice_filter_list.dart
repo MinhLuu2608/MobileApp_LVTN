@@ -259,9 +259,14 @@ class InvoiceFilterListState extends State<InvoiceFilterList> {
     return Padding(
       padding: const EdgeInsets.all(3),
       child: InkWell(
-        onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(
+        onTap: () async{
+          final response = await Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => InvoiceInfo(idHoaDon: snapshot.data[index].idHoaDon)));
+          if(response == null){
+            setState(() {
+              updateState = !updateState;
+            });
+          }
         },
         child: Card(
           shape:
@@ -280,7 +285,7 @@ class InvoiceFilterListState extends State<InvoiceFilterList> {
                   children: <Widget>[
                     Padding(
                       padding: const EdgeInsets.all(5.0),
-                      child: Text(snapshot.data[index].maSoPhieu, style: styleContent),
+                      child: Text(snapshot.data[index].maSoHoaDon, style: styleContent),
                     ), //Mã số phiếu
                     Padding(
                       padding: const EdgeInsets.all(5.0),

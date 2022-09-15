@@ -32,9 +32,9 @@ Future<Uint8List> buildPdf(PdfPageFormat pageFormat, EmpInvoice empInvoice) asyn
               child: pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.start,
                 children: [
-                  pw.Text("Mã số phiếu:", style: pw.TextStyle(fontSize: 25, fontWeight: pw.FontWeight.bold)),
+                  pw.Text("Mã hoá đơn:", style: pw.TextStyle(fontSize: 25, fontWeight: pw.FontWeight.bold)),
                   pw.SizedBox(width: 5),
-                  pw.Text(empInvoice.maSoPhieu, style: const pw.TextStyle(fontSize: 25)),
+                  pw.Text(empInvoice.maSoHoaDon, style: const pw.TextStyle(fontSize: 25)),
                 ],
               ),
             ), // Mã số phiếu
