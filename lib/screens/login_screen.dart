@@ -1,9 +1,11 @@
 import 'package:MobileApp_LVTN/constants.dart';
+import 'package:MobileApp_LVTN/screens/navigate_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:MobileApp_LVTN/widgets/inputDecoration.dart';
 import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'dart:convert';
 
 final urlAPI = url;
 
@@ -116,6 +118,21 @@ class LoginPageState extends State<LoginPage> {
       });
       final idNhanVien = respGetIDAccount.body;
       box1.put('IDNhanVien', int.parse(idNhanVien));
+    }
+
+    getEmpRole() async{
+      final idNV = box1.get("IDNhanVien");
+      final urlGetIDAccount = Uri.http(urlAPI, 'api/MobileApp/getEmpRole/$idNV');
+
+      final resp = await http.get(urlGetIDAccount, headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": "true",
+        "Content-type": "application/json",
+        "Accept": "application/json"
+      });
+      final response = json.decode(resp.body);
+      print(response);
+      return response;
     }
 
     return SingleChildScrollView(
@@ -233,8 +250,17 @@ class LoginPageState extends State<LoginPage> {
                                 Navigator.pushReplacementNamed(context, 'customer/home');
                               }
                               else{
-                                // Navigator.pushReplacementNamed(context, 'employee_thutien/home');
-                                Navigator.pushReplacementNamed(context, 'employee_dichvu/home');
+                                String empRole = await getEmpRole();
+                                if(empRole == "Thu tiền"){
+                                  Navigator.pushReplacementNamed(context, 'employee_thutien/home');
+                                }
+                                if(empRole == "Dịch vụ"){
+                                  Navigator.pushReplacementNamed(context, 'employee_dichvu/home');
+                                }
+                                if(empRole == "Thu tiền & Dịch vụ"){
+                                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                                      builder: (context) => NavigateScreen()));
+                                }
                               }
                             }
                             else{
@@ -248,9 +274,9 @@ class LoginPageState extends State<LoginPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Bạn chưa có tài khoản? "),
+                          const Text("Bạn chưa có tài khoản? "),
                           GestureDetector(
-                            child: Text(
+                            child: const Text(
                                 " Đăng ký ngay",
                                 style: TextStyle(
                                     fontSize: 18,
