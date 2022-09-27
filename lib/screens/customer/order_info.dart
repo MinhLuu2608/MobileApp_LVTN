@@ -136,10 +136,10 @@ class OrderInfoState extends State<OrderInfo>{
                     ],
                   ),
                 ), // Tình trạng xử lý
-                widget.donHang.tinhTrangXuLy == 'Đã bị huỷ' ? buildNote() :
-                widget.donHang.tinhTrangXuLy != 'Chờ xử lý' ? buildEmpInfo() :
-                widget.donHang.ngayHen != "Đơn hàng chưa xử lý" ? buildNgayHen() :
-                widget.donHang.tinhTrangXuLy == 'Đã hoàn thành' ? buildNgayThu() :
+                if(widget.donHang.tinhTrangXuLy == 'Đã bị huỷ') buildNote(),
+                if(widget.donHang.tinhTrangXuLy != 'Chờ xử lý') buildEmpInfo(),
+                if(widget.donHang.ngayHen != "Đơn hàng chưa xử lý") buildNgayHen(),
+                if(widget.donHang.tinhTrangXuLy == 'Đã hoàn thành') buildNgayThu(),
                 buildTableHeader(context),
                 FutureBuilder(
                   future: getOrderServiceInfo(),
@@ -166,65 +166,77 @@ class OrderInfoState extends State<OrderInfo>{
                     return const Text("Error while Calling API");
                   },
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 60),
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: const Color(0xC4e64c86),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
-                    ),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                          title: const Text("Huỷ đơn hàng"),
-                          content: const Text("Bạn có chắc chắn huỷ đơn hàng?"),
-                          actions: [
-                            TextButton(
-                              onPressed: () async{
-                                String response = await cancelOrders();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    backgroundColor: Colors.white30,
-                                    content: Text(response,
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                        )
-                                    )
-                                  )
-                                );
-                                if(response == 'Đơn hàng được huỷ thành công'){
-                                  Navigator.of(context).popUntil((route) => route.isFirst);
-                                }
-                              },
-                              child: const Text("OK"),
+                if(widget.donHang.tinhTrangXuLy == 'Chờ xử lý') Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 50, vertical: 60),
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                          backgroundColor: const Color(0xC4e64c86),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 10),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20))
+                      ),
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (_) =>
+                                AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          10.0)),
+                                  title: const Text("Huỷ đơn hàng"),
+                                  content: const Text(
+                                      "Bạn có chắc chắn huỷ đơn hàng?"),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () async {
+                                        String response = await cancelOrders();
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                            SnackBar(
+                                                backgroundColor: Colors.white30,
+                                                content: Text(response,
+                                                    style: const TextStyle(
+                                                      fontSize: 20,
+                                                      color: Colors.black,
+                                                      fontWeight: FontWeight
+                                                          .bold,
+                                                    )
+                                                )
+                                            )
+                                        );
+                                        if (response ==
+                                            'Đơn hàng được huỷ thành công') {
+                                          Navigator.of(context).popUntil((
+                                              route) => route.isFirst);
+                                        }
+                                      },
+                                      child: const Text("OK"),
 
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("CANCEL"),
-                            )
-                          ],
-                        )
-                      );
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.cancel_outlined),
-                        SizedBox(width: 10),
-                        Text("Huỷ đơn hàng", style: TextStyle(fontSize: 22, letterSpacing: 2.2)),
-                      ],
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text("CANCEL"),
+                                    )
+                                  ],
+                                )
+                        );
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.cancel_outlined),
+                          SizedBox(width: 10),
+                          Text("Huỷ đơn hàng", style: TextStyle(
+                              fontSize: 22, letterSpacing: 2.2)),
+                        ],
+                      ),
                     ),
                   ),
-                )
               ],
             )
           ],
