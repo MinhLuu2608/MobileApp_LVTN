@@ -129,7 +129,7 @@ class OrderListScreenState extends State<OrderListScreen> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           Expanded(
-            flex: 5,
+            flex: 6,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,12 +140,10 @@ class OrderListScreenState extends State<OrderListScreen> {
                 ), // Mã đơn hàng
                 Padding(
                   padding: const EdgeInsets.all(5.0),
-                  child: Text(snapshot.data[index].tenKhachHang, style: styleContent),
+                  child: Text("Tên KH: ${snapshot.data[index].tenKhachHang}", style: styleContent),
                 ), // Tên khách hàng
-                Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Text(snapshot.data[index].ngayTao, style: styleContent),
-                ), // Ngày tạo
+                buildNgayTao(snapshot, index), // Ngày tạo
+                if(snapshot.data[index].tinhTrangXuLy == "Đã tiếp nhận") buildNgayHen(snapshot, index),
                 Padding(
                   padding: const EdgeInsets.all(5.0),
                   child: buildTextTinhTrangXuLy(snapshot, index),
@@ -154,7 +152,7 @@ class OrderListScreenState extends State<OrderListScreen> {
             ),
           ),
           Expanded(
-            flex: 2,
+            flex: 1,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: const [
@@ -170,11 +168,26 @@ class OrderListScreenState extends State<OrderListScreen> {
     );
   }
 
+  Padding buildNgayTao(AsyncSnapshot<dynamic> snapshot, int index) {
+    return Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: Text("Ngày tạo: ${snapshot.data[index].ngayTao}",
+          style: styleContent),
+    );
+  }
+  Padding buildNgayHen(AsyncSnapshot<dynamic> snapshot, int index) {
+    return Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: Text("Ngày hẹn: ${snapshot.data[index].ngayHen} ${snapshot.data[index].buoiHen}",
+          style: styleContent),
+    );
+  }
+
   buildTextTinhTrangXuLy(AsyncSnapshot<dynamic> snapshot, int index) {
     if(snapshot.data[index].tinhTrangXuLy == "Chờ xử lý") {
       return Row(
         children: [
-          Text("Tình trạng xử lý: ", style: const TextStyle(fontSize: 20,)),
+          const Text("Tình trạng xử lý: ", style: TextStyle(fontSize: 20,)),
           Text(snapshot.data[index].tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.pinkAccent)),
         ],
       );
@@ -182,7 +195,7 @@ class OrderListScreenState extends State<OrderListScreen> {
     if(snapshot.data[index].tinhTrangXuLy == "Đã tiếp nhận"){
       return Row(
         children: [
-          Text("Tình trạng xử lý: ", style: const TextStyle(fontSize: 20,)),
+          const Text("Tình trạng xử lý: ", style: TextStyle(fontSize: 20,)),
           Text(snapshot.data[index].tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.blue)),
         ],
       );
@@ -190,7 +203,7 @@ class OrderListScreenState extends State<OrderListScreen> {
     if(snapshot.data[index].tinhTrangXuLy == "Đã hoàn thành"){
       return Row(
         children: [
-          Text("Tình trạng xử lý: ", style: const TextStyle(fontSize: 20,)),
+          const Text("Tình trạng xử lý: ", style: TextStyle(fontSize: 20,)),
           Text(snapshot.data[index].tinhTrangXuLy, style: const TextStyle(fontSize: 20, color: Colors.green)),
         ],
       );
@@ -202,7 +215,7 @@ class OrderListScreenState extends State<OrderListScreen> {
         children: [
           Row(
             children: [
-              Text("Tình trạng xử lý: ", style: const TextStyle(fontSize: 20,)),
+              const Text("Tình trạng xử lý: ", style: TextStyle(fontSize: 20,)),
               Text("${snapshot.data[index].tinhTrangXuLy} ", style: const TextStyle(fontSize: 20, color: Colors.grey)),
             ],
           ),

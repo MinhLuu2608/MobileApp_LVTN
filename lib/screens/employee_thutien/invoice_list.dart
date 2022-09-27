@@ -126,7 +126,7 @@ class InvoiceListState extends State<InvoiceList> {
                   children: <Widget>[
                     Padding(
                       padding: const EdgeInsets.all(5.0),
-                      child: Text(snapshot.data[index].maSoPhieu, style: styleContent),
+                      child: Text(snapshot.data[index].maSoHoaDon, style: styleContent),
                     ), //Mã số phiếu
                     Padding(
                       padding: const EdgeInsets.all(5.0),

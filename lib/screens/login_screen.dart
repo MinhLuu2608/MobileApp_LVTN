@@ -131,7 +131,6 @@ class LoginPageState extends State<LoginPage> {
         "Accept": "application/json"
       });
       final response = json.decode(resp.body);
-      print(response);
       return response;
     }
 
@@ -244,8 +243,6 @@ class LoginPageState extends State<LoginPage> {
                               await setIDNhanVien();
                               const snackBar = SnackBar(content: Text("Đăng nhập thành công", style: TextStyle(fontSize: 20)));
                               ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                              // print("IDAccount : ${box1.get("IDAccount").toString()}");
-                              // print("IDNhanVien: ${box1.get("IDNhanVien").toString()}");
                               if(box1.get("IDNhanVien") == -1){
                                 Navigator.pushReplacementNamed(context, 'customer/home');
                               }

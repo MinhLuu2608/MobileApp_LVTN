@@ -156,7 +156,10 @@ class OrderInfoState extends State<OrderInfo>{
                         shrinkWrap: true,
                         itemCount: snapshot.data.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return buildTableRow(context, snapshot, index);
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 8.0, right: 5.0, top: 5.0, bottom: 5.0),
+                            child: buildTableRow(context, snapshot, index),
+                          );
                         },
                       );
                     }

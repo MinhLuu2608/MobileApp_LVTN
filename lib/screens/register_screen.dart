@@ -159,13 +159,12 @@ class RegisterScreen extends StatelessWidget {
                           // var userAccount = userAccountProvider.userAccount;
                           if(!formKey.currentState!.validate()){
                             final snackBar = SnackBar(content: Text("Thông tin đăng ký không hợp lệ"));
-                            _scaffoldKey.currentState!.showSnackBar(snackBar);
+                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
                           }
                           else{
                             final respone = await accountRegister(txtUsername.text, txtPassword.text, txtSDT.text);
                             final snackBar = SnackBar(content: Text(respone));
-                            _scaffoldKey.currentState!.showSnackBar(snackBar);
-
+                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
                           }
 
                         },

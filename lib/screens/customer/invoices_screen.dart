@@ -101,7 +101,7 @@ class _InvoicesScreenState extends State<InvoicesScreen>{
                         onPressed: () async {
                           final response = await handleLinkAccountWithKH(txtMaKhachHang.text);
                           final snackBar = SnackBar(content: Text(response));
-                          _scaffoldKey.currentState!.showSnackBar(snackBar);
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
                           Navigator.of(context).pop();
                           setState(() {
                             updateState = !updateState;

@@ -70,7 +70,7 @@ class OrderInfoState extends State<OrderInfo>{
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: const Padding(padding: EdgeInsets.only(left: 50), child: Text('Chi tiết hoá đơn')),
+        title: const Padding(padding: EdgeInsets.only(left: 50), child: Text('Chi tiết đơn hàng')),
       ),
       body: SingleChildScrollView(
         child: Column(
