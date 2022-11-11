@@ -1,3 +1,4 @@
+import 'package:MobileApp_LVTN/screens/customer/home_details.dart';
 import 'package:MobileApp_LVTN/screens/customer/services_screen.dart';
 import 'package:MobileApp_LVTN/screens/settings.dart';
 
@@ -23,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen>{
   ];
 
   List<Widget> screens = [
-    const Text('Home', style: optionStyle),
+    HomeDetails(),
     InvoicesScreen(),
     ServicesScreen(),
     SettingsPage(),
