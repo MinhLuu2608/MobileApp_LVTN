@@ -1,12 +1,12 @@
 import 'package:MobileApp_LVTN/constants.dart';
-import 'package:MobileApp_LVTN/models/account.dart';
 import 'package:MobileApp_LVTN/screens/login_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:crypto/crypto.dart';
+
 
 const urlAPI = url;
 class ChangePass extends StatefulWidget {
@@ -36,6 +36,12 @@ class ChangePassState extends State<ChangePass> {
     box1 = await Hive.openBox('logindata');
   }
 
+  getHashMD5(String input){
+    var bytes = utf8.encode(input);
+    var md5Hash = md5.convert(bytes).toString();
+    return md5Hash;
+  }
+
   String checkValid() {
     if(_txtCurPassword.text.isEmpty || _txtNewPassword.text.isEmpty || _txtRePassword.text.isEmpty) {
       return 'Thông tin không thể trống';
@@ -53,9 +59,10 @@ class ChangePassState extends State<ChangePass> {
     final url = Uri.http(urlAPI, 'api/MobileApp/checkRepass');
     box1 = await Hive.openBox('logindata');
     final int IDAccount = box1.get("IDAccount");
+    String hashString = getHashMD5(_txtCurPassword.text);
     var jsonBody = {
       'IDAccount': IDAccount,
-      'Password': _txtCurPassword.text
+      'Password': hashString
     };
     String jsonStr = json.encode(jsonBody);
     final resp = await http.post(url, body: jsonStr, headers: {
@@ -72,9 +79,10 @@ class ChangePassState extends State<ChangePass> {
     final url = Uri.http(urlAPI, 'api/MobileApp/changePassword');
     box1 = await Hive.openBox('logindata');
     final int IDAccount = box1.get("IDAccount");
+    String hashString = getHashMD5(_txtNewPassword.text);
     var jsonBody = {
       'IDAccount': IDAccount,
-      'Password': _txtNewPassword.text
+      'Password': hashString
     };
     String jsonStr = json.encode(jsonBody);
     final resp = await http.put(url, body: jsonStr, headers: {

@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'dart:convert';
+import 'package:crypto/crypto.dart';
 
 final urlAPI = url;
 
@@ -54,6 +55,12 @@ class LoginPageState extends State<LoginPage> {
     }
   }
 
+  getHashMD5(String input){
+    var bytes = utf8.encode(input);
+    var md5Hash = md5.convert(bytes).toString();
+    return md5Hash;
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -77,7 +84,8 @@ class LoginPageState extends State<LoginPage> {
   SingleChildScrollView loginForm(BuildContext context) {
 
     checkLogin(String username, String password) async{
-      final url = Uri.http(urlAPI, 'api/MobileApp/$username/$password');
+      String hashString = getHashMD5(password);
+      final url = Uri.http(urlAPI, 'api/MobileApp/$username/$hashString');
       final resp = await http.get(url, headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Credentials": "true",
@@ -85,7 +93,6 @@ class LoginPageState extends State<LoginPage> {
         "Accept": "application/json"
       });
       final response = resp.body;
-
       if(response == "true") {
         return true;
       }
@@ -95,7 +102,8 @@ class LoginPageState extends State<LoginPage> {
     }
 
     setIDAccount(String username, String password) async{
-      final urlGetIDAccount = Uri.http(urlAPI, 'api/MobileApp/getIDAccount/$username/$password');
+      String hashString = getHashMD5(password);
+      final urlGetIDAccount = Uri.http(urlAPI, 'api/MobileApp/getIDAccount/$username/$hashString');
       final respGetIDAccount = await http.get(urlGetIDAccount, headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Credentials": "true",
