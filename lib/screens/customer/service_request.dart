@@ -25,7 +25,7 @@ class ServiceRequestState extends State<ServiceRequest> {
   static const TextStyle tableHeaderStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.bold);
   static const TextStyle tableRowStyle = TextStyle(fontSize: 14);
 
-  bool editStatus = false;
+  bool editStatus = true;
   bool showPassword = false;
   final _txtHoTen = TextEditingController();
   final _txtSDT = TextEditingController();
@@ -110,7 +110,7 @@ class ServiceRequestState extends State<ServiceRequest> {
             return const Text("Something Wrong");
           }
           if (snapshot.hasData) {
-            return buildInfo(context, snapshot.data[0], editStatus);
+            return buildInfo(context, snapshot.data[0]);
           }
           return const Text("Error while Calling API");
         },
@@ -118,40 +118,45 @@ class ServiceRequestState extends State<ServiceRequest> {
     );
   }
 
-  Container buildInfo(BuildContext context, Account accountInfo, bool editStatus) {
+  Container buildInfo(BuildContext context, Account accountInfo) {
     return Container(
       padding: const EdgeInsets.only(top: 25),
       child: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();
         },
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            const SizedBox(height: 15),
-            const Padding(
-              padding: EdgeInsets.only(bottom: 35),
-              child: Center(child: Text("Thông tin khách hàng:", style: headerStyle))
+        child: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const SizedBox(height: 15),
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 35),
+                  child: Center(child: Text("Thông tin khách hàng:", style: headerStyle))
+                ),
+                buildTextField("Họ và tên", accountInfo.hoTen, _txtHoTen, false, true),
+                buildTextFieldSDT("Số điện thoại", accountInfo.sdt, _txtSDT, false, true),
+                buildTextField("Địa chỉ", accountInfo.diaChi, _txtDiaChi, false, true),
+                const SizedBox(height: 25),
+                const Padding(
+                    padding: EdgeInsets.only(bottom: 15),
+                    child: Center(child: Text("Thông tin dịch vụ:", style: headerStyle))
+                ),
+                buildTableHeader(context),
+                buildTableRow(context),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      buildButtonConfirm(context),
+                    ],
+                  ),
+                )
+              ],
             ),
-            buildTextField("Họ và tên", accountInfo.hoTen, _txtHoTen, false, editStatus),
-            buildTextFieldSDT("Số điện thoại", accountInfo.sdt, _txtSDT, false, editStatus),
-            buildTextField("Địa chỉ", accountInfo.diaChi, _txtDiaChi, false, editStatus),
-            const SizedBox(height: 25),
-            const Padding(
-                padding: EdgeInsets.only(bottom: 15),
-                child: Center(child: Text("Thông tin dịch vụ:", style: headerStyle))
-            ),
-            buildTableHeader(context),
-            buildTableRow(context),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  buildButtonConfirm(context),
-                ],
-              ),
-            )
-          ],
+          ),
         ),
       ),
     );
