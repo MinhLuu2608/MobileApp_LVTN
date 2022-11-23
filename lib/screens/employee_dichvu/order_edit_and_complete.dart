@@ -7,7 +7,7 @@ import 'package:MobileApp_LVTN/models/chitiet_dichvu.dart';
 import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
-
+import 'package:crypto/crypto.dart';
 
 const urlAPI = url;
 
@@ -100,7 +100,7 @@ class OrderEditAndCompleteState extends State<OrderEditAndComplete>{
     final int IDAccount = box1.get("IDAccount");
     var jsonBody = {
       'IDAccount': IDAccount,
-      'Password': _password.text
+      'Password': getHashMD5(_password.text)
     };
     String jsonStr = json.encode(jsonBody);
     final resp = await http.post(url, body: jsonStr, headers: {
@@ -153,6 +153,12 @@ class OrderEditAndCompleteState extends State<OrderEditAndComplete>{
     });
     final response = resp.body;
     return response;
+  }
+
+  getHashMD5(String input){
+    var bytes = utf8.encode(input);
+    var md5Hash = md5.convert(bytes).toString();
+    return md5Hash;
   }
 
   @override

@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
+import 'package:crypto/crypto.dart';
 
 const urlAPI = url;
 
@@ -35,7 +36,7 @@ class InvoiceInfoState extends State<InvoiceInfo>{
     final int IDAccount = box1.get("IDAccount");
     var jsonBody = {
       'IDAccount': IDAccount,
-      'Password': _password.text
+      'Password': getHashMD5(_password.text)
     };
     String jsonStr = json.encode(jsonBody);
     final resp = await http.post(url, body: jsonStr, headers: {
@@ -66,6 +67,12 @@ class InvoiceInfoState extends State<InvoiceInfo>{
     setState(() {
       updateState = !updateState;
     });
+  }
+
+  getHashMD5(String input){
+    var bytes = utf8.encode(input);
+    var md5Hash = md5.convert(bytes).toString();
+    return md5Hash;
   }
 
   @override
