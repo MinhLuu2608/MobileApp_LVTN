@@ -1,4 +1,5 @@
 import 'package:MobileApp_LVTN/constants.dart';
+import 'package:MobileApp_LVTN/screens/No_roles.dart';
 import 'package:MobileApp_LVTN/screens/navigate_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:MobileApp_LVTN/widgets/inputDecoration.dart';
@@ -259,12 +260,16 @@ class LoginPageState extends State<LoginPage> {
                                 if(empRole == "Thu tiền"){
                                   Navigator.pushReplacementNamed(context, 'employee_thutien/home');
                                 }
-                                if(empRole == "Dịch vụ"){
+                                else if(empRole == "Dịch vụ"){
                                   Navigator.pushReplacementNamed(context, 'employee_dichvu/home');
                                 }
-                                if(empRole == "Thu tiền & Dịch vụ"){
+                                else if(empRole == "Thu tiền & Dịch vụ"){
                                   Navigator.of(context).pushReplacement(MaterialPageRoute(
                                       builder: (context) => NavigateScreen()));
+                                }
+                                else {
+                                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                                      builder: (context) => NoRoles()));
                                 }
                               }
                             }
