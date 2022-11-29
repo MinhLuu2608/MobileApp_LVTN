@@ -1,5 +1,6 @@
 import 'package:MobileApp_LVTN/constants.dart';
 import 'package:MobileApp_LVTN/models/donhang.dart';
+import 'package:MobileApp_LVTN/screens/employee_dichvu/order_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -68,7 +69,7 @@ class OrderAcceptState extends State<OrderAccept>{
       "Content-type": "application/json",
       // "Accept": "application/json"
     });
-    final response = resp.body;
+    final response = json.decode(resp.body);
     return response;
   }
 
@@ -206,7 +207,13 @@ class OrderAcceptState extends State<OrderAccept>{
                 ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(response, style: const TextStyle(fontSize: 20),))
                 );
-                Navigator.of(context).pop();
+                print(response);
+                if(response != "Đơn hàng này đã được tiếp nhận. Hãy kiểm tra lại"){
+                  Navigator.of(context).pop();
+                }
+                else{
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                }
               }
             },
             child: const Text("Xác nhận", style: TextStyle( fontSize: 16, letterSpacing: 2.2, color: Colors.black)),
